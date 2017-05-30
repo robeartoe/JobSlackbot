@@ -1,0 +1,5 @@
+#Indeed Api:
+token = "INDEED API TOKEN HERE"
+
+#Slack Api:
+SLACK_TOKEN = "SLACK TOKEN HERE"
