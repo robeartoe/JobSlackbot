@@ -6,7 +6,7 @@ slackLA = "#losangeles"
 slackNY = "#newyork"
 
 #Indeed Api:
-useIndeed = False
+useIndeed = True
 api = IndeedApi(token)
 JobKeywords = ["Python Internship","Web Developer Internship","Django Internship"]
 cities = ['Los Angeles', 'New York']

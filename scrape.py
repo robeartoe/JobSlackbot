@@ -6,7 +6,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean
 from sqlalchemy.orm import sessionmaker
-# from dateutil.parser import parse
 from slackclient import SlackClient
 from config.private import token, SLACK_TOKEN
 from util import postFromIndeed,postFromCraiglist
@@ -16,7 +15,6 @@ from indeed.indeed import IndeedApi
 engine = create_engine('sqlite:///listings.db', echo=False)
 
 Base = declarative_base()
-
 
 class Listing(Base):
     """
@@ -96,7 +94,7 @@ def scrape_area_jobs(area,searchcity,jobcategory):
 #This function will start the scraper. And post to slack.
 def do_scrape():
     #Create a slack client
-    sc = SlackClient(token)
+    sc = SlackClient(SLACK_TOKEN)
     allIndeedResults = {}
     allCraigslistResults = {}
     #Get all the results from craigslist
