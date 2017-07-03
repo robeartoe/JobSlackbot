@@ -1,6 +1,6 @@
 from craigslist import CraigslistJobs
 import time
-from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist
+from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist,resultNumber
 from indeed.indeed import IndeedApi
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
@@ -65,7 +65,7 @@ def scrape_area_indeed(keyword,searchcity):
 def scrape_area_jobs(area,searchcity,jobcategory):
     cl_j = CraigslistJobs(site = searchcity, area = area, category = jobcategory,
                             filters={'is_internship': want_internship})
-    genJ = cl_j.get_results(sort_by = 'newest', geotagged = True, limit = 1)
+    genJ = cl_j.get_results(sort_by = 'newest', geotagged = True, limit = resultNumber)
     RESULTS = []
     while True:
         try:
@@ -118,7 +118,6 @@ def do_scrape():
         for city in cities:
             allIndeedResults[city] = []
             for keyword in JobKeywords:
-                # Perhaps another loop for parameters?
                 allIndeedResults[city] += scrape_area_indeed(keyword,city)
         for city in cities:
             testString = "Found: {} results for this city: {} ".format(len(allIndeedResults[city]),city)

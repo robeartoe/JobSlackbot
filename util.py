@@ -1,16 +1,6 @@
 """
-The point of this file is to find the distance between two coordinates.
-Now I'll do the function three times.
-One to find the distance between a point of interst and a house.
-Next is to find the distance between a point of interest and a job.
-The final is to find the distance between a house and a job.
-
-Of course this will have to be different taking into account WantJob
-and WantHousing is True or False.
-
-The next function is to post results to slack.
+This function is to post results to slack.
 """
-from math import radians, cos, sin , asin, sqrt
 import settings
 
 def postFromIndeed(sc,result,city):
