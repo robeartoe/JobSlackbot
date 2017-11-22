@@ -1,15 +1,19 @@
-from craigslist import CraigslistJobs
-import time
-from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist,resultNumber
-from indeed.indeed import IndeedApi
+import time, threading, Queue
+from multiprocessing import pool
+from functools import partial
+
+from indeed.EZIndeed import EZIndeed, JobListing
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean
 from sqlalchemy.orm import sessionmaker
+
+from craigslist import CraigslistJobs
 from slackclient import SlackClient
 from config.private import token, SLACK_TOKEN
 from util import postFromIndeed,postFromCraiglist
-from indeed.indeed import IndeedApi
+from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist,resultNumber
 
 
 engine = create_engine('sqlite:///listings.db', echo=False)
@@ -38,8 +42,8 @@ session = Session()
 def scrape_area_indeed(keyword,searchcity):
     #Can use JobKey to see whether or not it's in the database
     RESULTS = []
-    api = IndeedApi(token)
-    json_results = api.search(keyword, searchcity)
+    api = EZIndeed(token)
+    json_results = api.search(keyword=keyword, location = searchcity, full = True)
 
     for result in json_results['results']:
         listing = session.query(Listing).filter_by(JobKeyOrID = result["jobkey"]).first()
@@ -102,25 +106,43 @@ def do_scrape():
 
     # THIS IS CRAIGSLIST:
     #For loop for cities, and for loop for the areas in said cities
-    if useCraigslist == True:
+    if useCraigslist:
         for city in Craigslistcities:
             allCraigslistResults[city] = []
+
             for area in areas[city]:
                 for jobcategory in jobCategorys:
                     allCraigslistResults[city] += scrape_area_jobs(area,city,jobcategory)
-        for city in Craigslistcities:
+
             testString = "Found: {} results for this city: {} ".format(len(allCraigslistResults[city]),city)
             print (testString)
-            for result in allCraigslistResults[city]:
-                postFromCraiglist(sc,result,city)
+
+            pool = Pool()
+            funct = partial(postFromCraiglist,sc,city)
+            pool.map(funct, allCraigslistResults[city])
+            pool.close()
+            pool.join()
+
+            # for result in allCraigslistResults[city]:
+            #     postFromCraiglist(sc,result,city)
+
     # THIS IS INDEED:
-    if useIndeed == True:
+    if useIndeed:
         for city in cities:
             allIndeedResults[city] = []
+
             for keyword in JobKeywords:
                 allIndeedResults[city] += scrape_area_indeed(keyword,city)
-        for city in cities:
+
+
             testString = "Found: {} results for this city: {} ".format(len(allIndeedResults[city]),city)
             print(testString)
-            for result in allIndeedResults[city]:
-                postFromIndeed(sc,result,city)
+
+            pool = Pool()
+            funct = partial(postFromIndeed,sc,city)
+            pool.map(funct, allIndeedResults[city])
+            pool.close()
+            pool.join()
+
+            # for result in allIndeedResults[city]:
+            #     postFromIndeed(sc,result,city)
