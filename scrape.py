@@ -105,52 +105,62 @@ def do_scrape():
     allCraigslistResults = {}
     #Get all the results from craigslist
     #This will iterate through areas, in settings.
+    Jobthreads = []
+    slackThreads = []
     jobQueue = Queue()
     slackQueue = Queue()
 
     for i in range(2):
-        worker = slackPostWorker(jobQueue)
+        worker = slackPostWorkerCL(slackQueue)
+        slackThreads.append(worker)
         worker.daemon = True
         worker.start()
 
 
     for i in range(2):
-        t = Thread(target=postFromCraiglist,args=(sc,result,city,))
-        t.start()
+        worker = craigslistWorker(jobQueue)
+        Jobthreads.append(worker)
+        worker.daemon = True
+        worker.start()
+
 
     # THIS IS CRAIGSLIST:
     #For loop for cities, and for loop for the areas in said cities
     if useCraigslist:
         for city in Craigslistcities:
             allCraigslistResults[city] = []
-
             for area in areas[city]:
                 for jobcategory in jobCategorys:
-                    # Threading:
                     jobQueue.put((area,city,jobcategory))
-                    # allCraigslistResults[city].append(scrape_area_jobs(area,city,jobcategory))
 
-
+            jobQueue.join()
+            # OR:
+            for worker is Jobthreads:
+                allCraigslistResults[city].extend(worker.join)
+            Jobthreads.clear()
 
             testString = "Found: {} results for this city: {} ".format(len(allCraigslistResults[city]),city)
             print (testString)
 
             # Threading Post Results?
             for result in allIndeedResults[city]:
-                postFromIndeed(sc,result,city)
-
-    jobQueue = Queue()
-    slackQueue = Queue()
-
-    for i in range(2):
-        t = Thread(target=scrape_area_jobs(area,city,jobcategory,))
-        t.start()
-    for i in range(2):
-        t = Thread(target=postFromCraiglist,args=(sc,result,city,))
-        t.start()
+                slackQueue.put((sc,result,city))
 
     # THIS IS INDEED:
     if useIndeed:
+        for i in range(2):
+            worker = slackPostWorkerIN(slackQueue)
+            slackThreads.append(worker)
+            worker.daemon = True
+            worker.start()
+
+
+        for i in range(2):
+            worker = craigslistWorker(jobQueue)
+            Jobthreads.append(worker)
+            worker.daemon = True
+            worker.start()
+
         for city in cities:
             allIndeedResults[city] = []
 
