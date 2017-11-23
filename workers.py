@@ -41,7 +41,7 @@ class slackPostWorkerCL(Thread):
             sc, city, result = self.queue.get()
             # Perform Slack Post:
             from util import postFromCraiglist
-            postFromCraiglist(sc,city,result)
+            postFromCraiglist(sc=sc,city=city,listing=result)
             # Update Queue:
             self.queue.task_done()
 
