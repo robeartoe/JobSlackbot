@@ -1,6 +1,7 @@
-import time, threading, Queue
-from multiprocessing import pool
-from functools import partial
+import time
+from workers import craigslistWorker, indeedWorker, slackPostWorker
+# from multiprocessing import pool
+# from functools import partial
 
 from indeed.EZIndeed import EZIndeed, JobListing
 
@@ -38,6 +39,7 @@ class Listing(Base):
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
 session = Session()
+
 
 def scrape_area_indeed(keyword,searchcity):
     #Can use JobKey to see whether or not it's in the database
@@ -103,6 +105,18 @@ def do_scrape():
     allCraigslistResults = {}
     #Get all the results from craigslist
     #This will iterate through areas, in settings.
+    jobQueue = Queue()
+    slackQueue = Queue()
+
+    for i in range(2):
+        worker = slackPostWorker(jobQueue)
+        worker.daemon = True
+        worker.start()
+
+
+    for i in range(2):
+        t = Thread(target=postFromCraiglist,args=(sc,result,city,))
+        t.start()
 
     # THIS IS CRAIGSLIST:
     #For loop for cities, and for loop for the areas in said cities
@@ -112,19 +126,28 @@ def do_scrape():
 
             for area in areas[city]:
                 for jobcategory in jobCategorys:
-                    allCraigslistResults[city] += scrape_area_jobs(area,city,jobcategory)
+                    # Threading:
+                    jobQueue.put((area,city,jobcategory))
+                    # allCraigslistResults[city].append(scrape_area_jobs(area,city,jobcategory))
+
+
 
             testString = "Found: {} results for this city: {} ".format(len(allCraigslistResults[city]),city)
             print (testString)
 
-            pool = Pool()
-            funct = partial(postFromCraiglist,sc,city)
-            pool.map(funct, allCraigslistResults[city])
-            pool.close()
-            pool.join()
+            # Threading Post Results?
+            for result in allIndeedResults[city]:
+                postFromIndeed(sc,result,city)
 
-            # for result in allCraigslistResults[city]:
-            #     postFromCraiglist(sc,result,city)
+    jobQueue = Queue()
+    slackQueue = Queue()
+
+    for i in range(2):
+        t = Thread(target=scrape_area_jobs(area,city,jobcategory,))
+        t.start()
+    for i in range(2):
+        t = Thread(target=postFromCraiglist,args=(sc,result,city,))
+        t.start()
 
     # THIS IS INDEED:
     if useIndeed:
@@ -132,17 +155,14 @@ def do_scrape():
             allIndeedResults[city] = []
 
             for keyword in JobKeywords:
+                # Threading?
                 allIndeedResults[city] += scrape_area_indeed(keyword,city)
 
 
             testString = "Found: {} results for this city: {} ".format(len(allIndeedResults[city]),city)
             print(testString)
 
-            pool = Pool()
-            funct = partial(postFromIndeed,sc,city)
-            pool.map(funct, allIndeedResults[city])
-            pool.close()
-            pool.join()
+            # Threading Post Results?
 
-            # for result in allIndeedResults[city]:
-            #     postFromIndeed(sc,result,city)
+            for result in allIndeedResults[city]:
+                postFromIndeed(sc,result,city)
