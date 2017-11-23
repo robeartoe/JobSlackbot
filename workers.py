@@ -1,20 +1,6 @@
 from queue import Queue
 from threading import Thread
 
-class slackPostWorkerCL(Thread):
-    def __init__(self,queue):
-        Thread.__init__(self)
-        self.queue = queue
-
-    def run(self):
-        while True:
-            # Get parameters from tuple:
-
-            # Perform Slack Post:
-
-            # Update Queue:
-            pass
-
 class slackPostWorkerIN(Thread):
     def __init__(self,queue):
         Thread.__init__(self)
@@ -43,15 +29,27 @@ class indeedWorker(Thread):
 
             # Update Queue:
             pass
+
+class slackPostWorkerCL(Thread):
+    def __init__(self,queue):
+        Thread.__init__(self)
+        self.queue = queue
+
+    def run(self):
+        while True:
+            # Get parameters from tuple:
+            sc, city, result = self.queue.get()
+            # Perform Slack Post:
+            from util import postFromCraiglist
+            postFromCraiglist(sc,city,result)
+            # Update Queue:
+            self.queue.task_done()
+
 class craigslistWorker(Thread):
     def __init__(self,queue):
         Thread.__init__(self)
         self.queue = queue
         self.RESULTS = []
-
-        # Make a RESULTS list here.
-        # Then when it's time to join. Join them here.
-        # At scrape.py, make allCraigslistResults[ciyt] = RESULTS (The results here.)
 
     def run(self):
         while True:

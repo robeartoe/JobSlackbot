@@ -1,7 +1,5 @@
 import time
-from workers import craigslistWorker, indeedWorker, slackPostWorker
-# from multiprocessing import pool
-# from functools import partial
+from queue import Queue
 
 from indeed.EZIndeed import EZIndeed, JobListing
 
@@ -10,6 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean
 from sqlalchemy.orm import sessionmaker
 
+from workers import craigslistWorker, indeedWorker, slackPostWorkerCL
 from craigslist import CraigslistJobs
 from slackclient import SlackClient
 from config.private import token, SLACK_TOKEN
@@ -17,7 +16,7 @@ from util import postFromIndeed,postFromCraiglist
 from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist,resultNumber
 
 
-engine = create_engine('sqlite:///listings.db', echo=False)
+engine = create_engine('sqlite:///listings.db', connect_args={'check_same_thread': False} , echo=False)
 
 Base = declarative_base()
 
@@ -105,17 +104,10 @@ def do_scrape():
     allCraigslistResults = {}
     #Get all the results from craigslist
     #This will iterate through areas, in settings.
+
     Jobthreads = []
-    slackThreads = []
     jobQueue = Queue()
     slackQueue = Queue()
-
-    for i in range(2):
-        worker = slackPostWorkerCL(slackQueue)
-        slackThreads.append(worker)
-        worker.daemon = True
-        worker.start()
-
 
     for i in range(2):
         worker = craigslistWorker(jobQueue)
@@ -123,6 +115,10 @@ def do_scrape():
         worker.daemon = True
         worker.start()
 
+    for i in range(2):
+        worker = slackPostWorkerCL(slackQueue)
+        worker.daemon = True
+        worker.start()
 
     # THIS IS CRAIGSLIST:
     #For loop for cities, and for loop for the areas in said cities
@@ -133,27 +129,27 @@ def do_scrape():
                 for jobcategory in jobCategorys:
                     jobQueue.put((area,city,jobcategory))
 
-            jobQueue.join()
-            # OR:
-            for worker is Jobthreads:
-                allCraigslistResults[city].extend(worker.join)
+            #TODO: It's appending a list of lists. Which I don't want.
+            for worker in Jobthreads:
+                threadResults = worker.join()
+                for result in threadResults:
+                    allCraigslistResults[city].append(result)
             Jobthreads.clear()
 
-            testString = "Found: {} results for this city: {} ".format(len(allCraigslistResults[city]),city)
-            print (testString)
+            foundString = "Found: {} results for this city: {} ".format(len(allCraigslistResults[city]),city)
+            print (foundString)
 
-            # Threading Post Results?
-            for result in allIndeedResults[city]:
-                slackQueue.put((sc,result,city))
+            for result in allCraigslistResults[city]:
+                slackQueue.put((sc,city,result))
 
     # THIS IS INDEED:
+    # TODO: useIndeed = False (at least for now)
     if useIndeed:
         for i in range(2):
             worker = slackPostWorkerIN(slackQueue)
             slackThreads.append(worker)
             worker.daemon = True
             worker.start()
-
 
         for i in range(2):
             worker = craigslistWorker(jobQueue)
@@ -168,11 +164,8 @@ def do_scrape():
                 # Threading?
                 allIndeedResults[city] += scrape_area_indeed(keyword,city)
 
-
             testString = "Found: {} results for this city: {} ".format(len(allIndeedResults[city]),city)
             print(testString)
-
-            # Threading Post Results?
 
             for result in allIndeedResults[city]:
                 postFromIndeed(sc,result,city)

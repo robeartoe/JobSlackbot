@@ -19,6 +19,7 @@ def postFromIndeed(sc,city,result):
         )
 def postFromCraiglist(sc,city,listing):
     # Simply copy and paste these statements to add more cities, or remove cities. Then change city accordingly.
+    # print("postFromCraiglist was called: sc:{},city:{},listing:{}".format(sc,city,listing))
     if city == "Los Angeles" or city == 'losangeles':
         description = "{}|{}|{}|<{}>".format(listing["where"],listing["name"],listing['url'],listing["datetime"])
         sc.api_call(
