@@ -8,7 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean
 from sqlalchemy.orm import sessionmaker
 
-from workers import craigslistWorker, indeedWorker, slackPostWorkerCL
+from workers import craigslistWorker, indeedWorker, slackPostWorkerCL, slackPostWorkerIN
 from craigslist import CraigslistJobs
 from slackclient import SlackClient
 from config.private import token, SLACK_TOKEN
@@ -106,6 +106,7 @@ def do_scrape():
     #This will iterate through areas, in settings.
 
     Jobthreads = []
+    slackThreads = []
     jobQueue = Queue()
     slackQueue = Queue()
 
@@ -116,9 +117,10 @@ def do_scrape():
         worker.start()
 
     for i in range(2):
-        worker = slackPostWorkerCL(slackQueue)
-        worker.daemon = True
-        worker.start()
+        slackWorker = slackPostWorkerCL(slackQueue)
+        slackThreads.append(slackWorker)
+        slackWorker.daemon = True
+        slackWorker.start()
 
     # THIS IS CRAIGSLIST:
     #For loop for cities, and for loop for the areas in said cities
@@ -137,17 +139,22 @@ def do_scrape():
             Jobthreads.clear()
 
             foundString = "Found: {} results for this city: {} ".format(len(allCraigslistResults[city]),city)
-            print (foundString)
+            print(foundString)
 
             for result in allCraigslistResults[city]:
                 slackQueue.put((sc,city,result))
+
+            # for worker in slackThreads:
+            #     worker.join()
+            # slackThreads.clear()
+
 
     # THIS IS INDEED:
     # TODO: useIndeed = False (at least for now)
     if useIndeed:
         for i in range(2):
             worker = slackPostWorkerIN(slackQueue)
-            slackThreads.append(worker)
+            # slackThreads.append(worker)
             worker.daemon = True
             worker.start()
 

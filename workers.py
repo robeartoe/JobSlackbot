@@ -57,7 +57,7 @@ class craigslistWorker(Thread):
             area, city, jobC = self.queue.get()
             # Search Craigslist:
             from scrape import scrape_area_jobs
-            self.RESULTS.append(scrape_area_jobs(area=area, searchcity=city, jobcategory=jobC))
+            self.RESULTS = scrape_area_jobs(area=area, searchcity=city, jobcategory=jobC)
             # Update Queue:
             self.queue.task_done()
     def join(self):
