@@ -1,18 +1,16 @@
-import time
 from queue import Queue
 
-from indeed.EZIndeed import EZIndeed, JobListing
+from indeed.EZIndeed import EZIndeed
 
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 from workers import craigslistWorker, indeedWorker, slackPostWorkerCL, slackPostWorkerIN
 from craigslist import CraigslistJobs
 from slackclient import SlackClient
 from config.private import token, SLACK_TOKEN
-from util import postFromIndeed,postFromCraiglist
 from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist,resultNumber
 
 

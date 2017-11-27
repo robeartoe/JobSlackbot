@@ -1,6 +1,4 @@
 #In here all settings, all variables can be configured here.
-from indeed.indeed import IndeedApi
-from config.private import token
 
 slackLA = "#losangeles"
 slackNY = "#newyork"

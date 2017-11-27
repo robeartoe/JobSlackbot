@@ -2,7 +2,6 @@ from scrape import do_scrape
 import time
 import traceback
 import sys
-from settings import SLEEP_INTERVAL
 
 if __name__ == "__main__":
     starttime = time.time()
