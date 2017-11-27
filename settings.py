@@ -12,7 +12,7 @@ cities = ['Los Angeles']
 # Cities: cities = ['Los Angeles', 'New York']
 
 #Craigslist Api:-------------------------------------------------------------------------------------------------
-useCraigslist = False
+useCraigslist = True
 jobCategorys = ['sof', 'jjj']
 want_internship = True
 resultNumber = 1 #Be careful with this, don't bring back too many results.

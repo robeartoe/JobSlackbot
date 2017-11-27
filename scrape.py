@@ -95,7 +95,7 @@ def scrape_area_jobs(area,searchcity,jobcategory):
             )
             #Save Session:
             session.add(listing)
-            # session.commit()
+            session.commit()
             RESULTS.append(result)
     return RESULTS
 
@@ -129,6 +129,7 @@ def do_scrape():
             slackWorker.start()
 
         for city in Craigslistcities:
+            allCraigslistResults[city] = []
             for area in areas[city]:
                 for jobcategory in jobCategorys:
                     jobQueue.put((area,city,jobcategory))
@@ -144,6 +145,9 @@ def do_scrape():
 
             for result in allCraigslistResults[city]:
                 slackQueue.put((sc,city,result))
+            for worker in slackThreads:
+                worker.join()
+            slackThreads.clear()
 
     # THIS IS INDEED:
     if useIndeed:
@@ -156,7 +160,7 @@ def do_scrape():
             worker.start()
         for i in range(2):
             worker = slackPostWorkerIN(slackQueue)
-            # slackThreads.append(worker)
+            slackThreads.append(worker)
             worker.daemon = True
             worker.start()
 
@@ -174,4 +178,6 @@ def do_scrape():
             print(testString)
 
             for result in allIndeedResults[city]:
-                slackQueue.put((sc,result,city))
+                slackQueue.put((sc,city,result))
+            for worker in slackThreads:
+                worker.join()

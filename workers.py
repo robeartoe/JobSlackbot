@@ -27,12 +27,13 @@ class slackPostWorkerIN(Thread):
         while True:
             # Get parameters from tuple:
             sc, city, result = self.queue.get()
-            print(sc,city,result)
             # Perform Slack Post:
             from util import postFromIndeed
-            postFromIndeed(sc=sc,city=city,result=result)
+            postFromIndeed(sc,city,result)
             # Update Queue:
             self.queue.task_done()
+    def join(self):
+        self.queue.join()
 
 class slackPostWorkerCL(Thread):
     def __init__(self,queue):
@@ -48,6 +49,8 @@ class slackPostWorkerCL(Thread):
             postFromCraiglist(sc=sc,city=city,listing=listing)
             # Update Queue:
             self.queue.task_done()
+    def join(self):
+        self.queue.join()
 
 class craigslistWorker(Thread):
     def __init__(self,queue):
