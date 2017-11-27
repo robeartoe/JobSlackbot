@@ -6,15 +6,13 @@ slackLA = "#losangeles"
 slackNY = "#newyork"
 
 #Indeed Api:-----------------------------------------------------------------------------------------------------
-useIndeed = False
-api = IndeedApi(token)
+useIndeed = True
 JobKeywords = ["Python Internship","Web Developer Internship","python intern","web developer intern","Computer Science Internship"]
 cities = ['Los Angeles']
 # Cities: cities = ['Los Angeles', 'New York']
 
-
 #Craigslist Api:-------------------------------------------------------------------------------------------------
-useCraigslist = True
+useCraigslist = False
 jobCategorys = ['sof', 'jjj']
 want_internship = True
 resultNumber = 1 #Be careful with this, don't bring back too many results.

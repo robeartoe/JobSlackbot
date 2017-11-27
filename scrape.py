@@ -6,7 +6,7 @@ from indeed.EZIndeed import EZIndeed, JobListing
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 from workers import craigslistWorker, indeedWorker, slackPostWorkerCL, slackPostWorkerIN
 from craigslist import CraigslistJobs
@@ -16,7 +16,7 @@ from util import postFromIndeed,postFromCraiglist
 from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist,resultNumber
 
 
-engine = create_engine('sqlite:///listings.db', connect_args={'check_same_thread': False} , echo=False)
+engine = create_engine('sqlite:///listings.db',connect_args={'check_same_thread': False}, echo=False)
 
 Base = declarative_base()
 
@@ -37,14 +37,13 @@ class Listing(Base):
 
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
-session = Session()
-
+session = scoped_session(Session)
 
 def scrape_area_indeed(keyword,searchcity):
     #Can use JobKey to see whether or not it's in the database
     RESULTS = []
     api = EZIndeed(token)
-    json_results = api.search(keyword=keyword, location = searchcity, full = True)
+    json_results = api.search(keyword=keyword,limit =1, location = searchcity, full = True)
 
     for result in json_results['results']:
         listing = session.query(Listing).filter_by(JobKeyOrID = result["jobkey"]).first()
@@ -62,8 +61,12 @@ def scrape_area_indeed(keyword,searchcity):
                 city = searchcity
             )
             #Save Session:
-            session.add(listing)
-            session.commit()
+            try:
+                session.add(listing)
+                session.commit()
+            except:
+                print("Error DB")
+            # session.commit()
             RESULTS.append(result)
     return RESULTS
 
@@ -92,7 +95,7 @@ def scrape_area_jobs(area,searchcity,jobcategory):
             )
             #Save Session:
             session.add(listing)
-            session.commit()
+            # session.commit()
             RESULTS.append(result)
     return RESULTS
 
@@ -104,34 +107,32 @@ def do_scrape():
     allCraigslistResults = {}
     #Get all the results from craigslist
     #This will iterate through areas, in settings.
-
     Jobthreads = []
     slackThreads = []
-    jobQueue = Queue()
-    slackQueue = Queue()
 
-    for i in range(2):
-        worker = craigslistWorker(jobQueue)
-        Jobthreads.append(worker)
-        worker.daemon = True
-        worker.start()
-
-    for i in range(2):
-        slackWorker = slackPostWorkerCL(slackQueue)
-        slackThreads.append(slackWorker)
-        slackWorker.daemon = True
-        slackWorker.start()
 
     # THIS IS CRAIGSLIST:
     #For loop for cities, and for loop for the areas in said cities
     if useCraigslist:
+        jobQueue = Queue()
+        slackQueue = Queue()
+        for i in range(2):
+            worker = craigslistWorker(jobQueue)
+            Jobthreads.append(worker)
+            worker.daemon = True
+            worker.start()
+
+        for i in range(2):
+            slackWorker = slackPostWorkerCL(slackQueue)
+            slackThreads.append(slackWorker)
+            slackWorker.daemon = True
+            slackWorker.start()
+
         for city in Craigslistcities:
-            allCraigslistResults[city] = []
             for area in areas[city]:
                 for jobcategory in jobCategorys:
                     jobQueue.put((area,city,jobcategory))
 
-            #TODO: It's appending a list of lists. Which I don't want.
             for worker in Jobthreads:
                 threadResults = worker.join()
                 for result in threadResults:
@@ -144,35 +145,33 @@ def do_scrape():
             for result in allCraigslistResults[city]:
                 slackQueue.put((sc,city,result))
 
-            # for worker in slackThreads:
-            #     worker.join()
-            # slackThreads.clear()
-
-
     # THIS IS INDEED:
-    # TODO: useIndeed = False (at least for now)
     if useIndeed:
+        jobQueue = Queue()
+        slackQueue = Queue()
+        for i in range(2):
+            worker = indeedWorker(jobQueue)
+            Jobthreads.append(worker)
+            worker.daemon = True
+            worker.start()
         for i in range(2):
             worker = slackPostWorkerIN(slackQueue)
             # slackThreads.append(worker)
             worker.daemon = True
             worker.start()
 
-        for i in range(2):
-            worker = craigslistWorker(jobQueue)
-            Jobthreads.append(worker)
-            worker.daemon = True
-            worker.start()
-
         for city in cities:
             allIndeedResults[city] = []
-
             for keyword in JobKeywords:
-                # Threading?
-                allIndeedResults[city] += scrape_area_indeed(keyword,city)
+                jobQueue.put((keyword,city))
+            for worker in Jobthreads:
+                threadResults = worker.join()
+                for result in threadResults:
+                    allIndeedResults[city].append(result)
+            Jobthreads.clear()
 
             testString = "Found: {} results for this city: {} ".format(len(allIndeedResults[city]),city)
             print(testString)
 
             for result in allIndeedResults[city]:
-                postFromIndeed(sc,result,city)
+                slackQueue.put((sc,result,city))
