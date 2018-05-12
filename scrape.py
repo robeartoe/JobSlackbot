@@ -6,7 +6,9 @@ from craigslist import CraigslistJobs
 from slackclient import SlackClient
 from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist,resultNumber,slackToken,indeedToken
 
-from main import db
+from main import Listing,db
+
+print(Listing)
 
 def scrape_area_indeed(keyword,searchcity):
     #Can use JobKey to see whether or not it's in the database
@@ -15,7 +17,8 @@ def scrape_area_indeed(keyword,searchcity):
     json_results = api.search(keyword=keyword,limit =1, location = searchcity, full = True)
 
     for result in json_results['results']:
-        listing = db.query(Listing).filter_by(JobKeyOrID = result["jobkey"]).first()
+        # listing = db.session.query(Listing).filter_by(JobKeyOrID = result["jobkey"]).one()
+        listing = Listing.query.filter_by(JobKeyOrID = result["jobkey"]).first()
         #If the listing already exist. Don't add it again.
         if listing is None:
         #If it does not exist. Get in more detail with it.
@@ -31,8 +34,8 @@ def scrape_area_indeed(keyword,searchcity):
             )
             #Save Session:
             try:
-                db.add(listing)
-                db.commit()
+                db.session.add(listing)
+                db.session.commit()
             except:
                 print("Error DB")
             # session.commit()
@@ -51,7 +54,7 @@ def scrape_area_jobs(area,searchcity,jobcategory):
             break
         except Exception:
             continue
-        listing = db.query(Listing).filter_by(JobKeyOrID=result["id"]).first()
+        listing = Listing.query.filter_by(JobKeyOrID = result["id"]).first()
         if listing is None:
             # Create Listing Object:
             listing = Listing(
@@ -63,8 +66,8 @@ def scrape_area_jobs(area,searchcity,jobcategory):
                 JobKeyOrID = result['id']
             )
             #Save Session:
-            db.add(listing)
-            db.commit()
+            db.session.add(listing)
+            db.session.commit()
             RESULTS.append(result)
     return RESULTS
 

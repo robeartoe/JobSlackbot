@@ -14,15 +14,6 @@ app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-from scrape import do_scrape
-
-# engine = create_engine('sqlite:///listings.db',connect_args={'check_same_thread': False}, echo=False)
-# Base = declarative_base()
-
-# Base.metadata.create_all(engine)
-# Session = sessionmaker(bind=engine)
-# session = scoped_session(Session)
-
 class Listing(db.Model):
     """
     Hold all types of data on listing.
@@ -37,6 +28,9 @@ class Listing(db.Model):
     location = db.Column(db.String(400)) #'formattedLocation', and 'where' for craigslist
     city = db.Column(db.String(400)) #Los Angeles or New York
     JobKeyOrID = db.Column(db.String(400), unique=True) #'jobkey' for Indeed and 'id' for Craigslist
+
+
+from scrape import do_scrape
 
 
 @app.route("/")
