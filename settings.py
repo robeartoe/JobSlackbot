@@ -1,10 +1,15 @@
-#In here all settings, all variables can be configured here.
+from dotenv import load_dotenv
+load_dotenv()
+import os
 
+#In here all settings, all variables can be configured here.
 slackLA = "#losangeles"
 slackNY = "#newyork"
+slackToken = os.getenv("SLACK_TOKEN")
 
 #Indeed Api:-----------------------------------------------------------------------------------------------------
 useIndeed = True
+indeedToken = os.getenv("INDEED_TOKEN")
 JobKeywords = ["Python Internship","Web Developer Internship","python intern","web developer intern","Computer Science Internship"]
 cities = ['Los Angeles']
 # Cities: cities = ['Los Angeles', 'New York']
@@ -19,6 +24,3 @@ Craigslistcities = ['losangeles']
 
 areas = {'losangeles': ['lac']}
 # areas = {'losangeles': ['lac'] , 'newyork': ['mnh','brk','que','brx']}
-
-SLEEP_INTERVAL = 180 * 60 #Three hour Interval
-#60 minutes. Change the first number to adjust minutes.

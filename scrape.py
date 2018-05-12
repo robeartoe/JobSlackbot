@@ -1,50 +1,21 @@
-from queue import Queue
+from Queue import Queue
 
 from indeed.EZIndeed import EZIndeed
-
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import sessionmaker, scoped_session
-
 from workers import craigslistWorker, indeedWorker, slackPostWorkerCL, slackPostWorkerIN
 from craigslist import CraigslistJobs
 from slackclient import SlackClient
-from config.private import token, SLACK_TOKEN
-from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist,resultNumber
+from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist,resultNumber,slackToken,indeedToken
 
-
-engine = create_engine('sqlite:///listings.db',connect_args={'check_same_thread': False}, echo=False)
-
-Base = declarative_base()
-
-class Listing(Base):
-    """
-    Hold all types of data on listing.
-    """
-    __tablename__ = 'listings'
-
-    id = Column(Integer , primary_key = True)
-    link = Column(String, unique = True) #'url' for both Indeed and Craigslist
-    created = Column(String) #'date' for Indeed and 'datetime' for Craigslist
-    name = Column(String,nullable = True) #'company' Name Only for Indeed
-    title = Column(String) # 'jobtitle' for Indeed and and 'name' forCraigslist
-    location = Column(String) #'formattedLocation', and 'where' for craigslist
-    city = Column(String) #Los Angeles or New York
-    JobKeyOrID = Column(String, unique=True) #'jobkey' for Indeed and 'id' for Craigslist
-
-Base.metadata.create_all(engine)
-Session = sessionmaker(bind=engine)
-session = scoped_session(Session)
+from main import db
 
 def scrape_area_indeed(keyword,searchcity):
     #Can use JobKey to see whether or not it's in the database
     RESULTS = []
-    api = EZIndeed(token)
+    api = EZIndeed(indeedToken)
     json_results = api.search(keyword=keyword,limit =1, location = searchcity, full = True)
 
     for result in json_results['results']:
-        listing = session.query(Listing).filter_by(JobKeyOrID = result["jobkey"]).first()
+        listing = db.query(Listing).filter_by(JobKeyOrID = result["jobkey"]).first()
         #If the listing already exist. Don't add it again.
         if listing is None:
         #If it does not exist. Get in more detail with it.
@@ -60,8 +31,8 @@ def scrape_area_indeed(keyword,searchcity):
             )
             #Save Session:
             try:
-                session.add(listing)
-                session.commit()
+                db.add(listing)
+                db.commit()
             except:
                 print("Error DB")
             # session.commit()
@@ -80,7 +51,7 @@ def scrape_area_jobs(area,searchcity,jobcategory):
             break
         except Exception:
             continue
-        listing = session.query(Listing).filter_by(JobKeyOrID=result["id"]).first()
+        listing = db.query(Listing).filter_by(JobKeyOrID=result["id"]).first()
         if listing is None:
             # Create Listing Object:
             listing = Listing(
@@ -92,15 +63,15 @@ def scrape_area_jobs(area,searchcity,jobcategory):
                 JobKeyOrID = result['id']
             )
             #Save Session:
-            session.add(listing)
-            session.commit()
+            db.add(listing)
+            db.commit()
             RESULTS.append(result)
     return RESULTS
 
 #This function will start the scraper. And post to slack.
 def do_scrape():
     #Create a slack client
-    sc = SlackClient(SLACK_TOKEN)
+    sc = SlackClient(slackToken)
     allIndeedResults = {}
     allCraigslistResults = {}
     #Get all the results from craigslist
@@ -136,7 +107,7 @@ def do_scrape():
                 threadResults = worker.join()
                 for result in threadResults:
                     allCraigslistResults[city].append(result)
-            Jobthreads.clear()
+            Jobthreads *= 0
 
             foundString = "Found: {} results for this city: {} ".format(len(allCraigslistResults[city]),city)
             print(foundString)
@@ -145,7 +116,7 @@ def do_scrape():
                 slackQueue.put((sc,city,result))
             for worker in slackThreads:
                 worker.join()
-            slackThreads.clear()
+            slackThreads *= 0
 
     # THIS IS INDEED:
     if useIndeed:
@@ -170,7 +141,7 @@ def do_scrape():
                 threadResults = worker.join()
                 for result in threadResults:
                     allIndeedResults[city].append(result)
-            Jobthreads.clear()
+            Jobthreads *= 0
 
             testString = "Found: {} results for this city: {} ".format(len(allIndeedResults[city]),city)
             print(testString)
