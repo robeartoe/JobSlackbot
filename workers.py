@@ -55,6 +55,7 @@ class craigslistWorker(Thread):
     def __init__(self,queue):
         Thread.__init__(self)
         self.queue = queue
+        self.RESULTS = []
 
     def run(self):
         while True:

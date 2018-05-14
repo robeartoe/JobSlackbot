@@ -18,7 +18,7 @@ cities = ['Los Angeles']
 useCraigslist = True
 jobCategorys = ['sof', 'jjj']
 want_internship = True
-resultNumber = 1 #Be careful with this, don't bring back too many results.
+resultNumber = 3 #Be careful with this, don't bring back too many results.
 Craigslistcities = ['losangeles']
 # Craigslistcities = ['losangeles','newyork']
 

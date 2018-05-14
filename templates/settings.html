@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Indeed/Craigslist SlackBot Settings</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Oswald|Raleway" rel="stylesheet">
+ </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <div class="jumbotron">
+            <h1 class="display-5">SlackBot Settings:</h1>
+            <p class="lead">Allows you to set cities,services and keywords.</p>
+            <a href="/" class="btn btn-primary btn-lg btn-block" role="button" aria-pressed="true">View Listings</a>
+
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col">
+          <form class="" action="update" method="post" >
+            <div class="row">
+              <div class="col-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="clcheck" data-toggle="toggle">
+                  <label class="form-check-label" for="clcheck">
+                    <h4>Craigslist</h4>
+                  </label>
+                </div>
+              </div>
+              <div class="col-9" id="clform" style="display:none;">
+                <div id="clList">
+
+                </div>
+                <div class="form-group" >
+                  <label for="clCities">Cities:</label>
+                  <input type="text" class="form-control" id="clCities" placeholder="losangeles">
+                </div>
+                <div class="form-group">
+                  <label for="clAreas">Areas:</label>
+                  <input type="text" class="form-control" id="clAreas" placeholder="lac">
+                </div>
+                <div class="form-group">
+                  <label for="clKeywords">Categories: </label>
+                  <input type="text" class="form-control" id="clCategories" placeholder="soj, jjj">
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="clInter">
+                  <label class="form-check-label" for="clIntern">
+                    Internship
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label for="clslack">Slack Channel: </label>
+                  <input type="text" class="form-control" id="clslack" placeholder="#losangeles">
+                </div>
+                <a href="#" class="btn btn-primary" role="button" aria-pressed="true">Add</a>
+              </div>
+            </div>
+            <hr>
+            <div class="row">
+              <div class="col-3">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" value="" id="incheck">
+                  <label class="form-check-label" for="incheck">
+                    <h4>Indeed</h4>
+                  </label>
+                </div>
+              </div>
+              <div class="col-9" id="indeedform" style="display:none;">
+                <div class="inList">
+
+                </div>
+                <div class="form-group">
+                  <label for="indeedCities">Cities:</label>
+                  <input type="text" class="form-control" id="indeedCities" placeholder="Los Angeles">
+                </div>
+                <div class="form-group">
+                  <label for="indeedKeywords">Keywords: </label>
+                  <input type="text" class="form-control" id="indeedKeywords" placeholder="Web Developer Intern, Computer Science Intern, etc">
+                </div>
+                <div class="form-group">
+                  <label for="clslack">Slack Channel: </label>
+                  <input type="text" class="form-control" id="clslack" placeholder="#losangeles">
+                </div>
+                <a href="#" class="btn btn-primary" role="button" aria-pressed="true">Add</a>
+              </div>
+            </div>
+            <hr>
+            <div class="row">
+              <button class="btn btn-primary" type="submit">Update Settings</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- Personal JS -->
+    <script type="text/javascript" src="{{ url_for('static',filename='js/settings.js') }}"></script>
+  </body>
+</html>

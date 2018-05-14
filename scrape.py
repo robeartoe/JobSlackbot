@@ -6,9 +6,8 @@ from craigslist import CraigslistJobs
 from slackclient import SlackClient
 from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist,resultNumber,slackToken,indeedToken
 
-from main import Listing,db
-
-print(Listing)
+from main import db
+from models import Listing
 
 def scrape_area_indeed(keyword,searchcity):
     #Can use JobKey to see whether or not it's in the database
@@ -17,7 +16,6 @@ def scrape_area_indeed(keyword,searchcity):
     json_results = api.search(keyword=keyword,limit =1, location = searchcity, full = True)
 
     for result in json_results['results']:
-        # listing = db.session.query(Listing).filter_by(JobKeyOrID = result["jobkey"]).one()
         listing = Listing.query.filter_by(JobKeyOrID = result["jobkey"]).first()
         #If the listing already exist. Don't add it again.
         if listing is None:
@@ -36,9 +34,10 @@ def scrape_area_indeed(keyword,searchcity):
             try:
                 db.session.add(listing)
                 db.session.commit()
-            except:
+                db.session.close()
+            except Exception as inst:
+                print(inst)
                 print("Error DB")
-            # session.commit()
             RESULTS.append(result)
     return RESULTS
 
@@ -66,8 +65,13 @@ def scrape_area_jobs(area,searchcity,jobcategory):
                 JobKeyOrID = result['id']
             )
             #Save Session:
-            db.session.add(listing)
-            db.session.commit()
+            try:
+                db.session.add(listing)
+                db.session.commit()
+                db.session.close()
+            except Exception as inst:
+                print(inst)
+                print("Error DB")
             RESULTS.append(result)
     return RESULTS
 
@@ -88,13 +92,11 @@ def do_scrape():
     if useCraigslist:
         jobQueue = Queue()
         slackQueue = Queue()
-        for i in range(2):
+        for i in range(4):
             worker = craigslistWorker(jobQueue)
             Jobthreads.append(worker)
             worker.daemon = True
             worker.start()
-
-        for i in range(2):
             slackWorker = slackPostWorkerCL(slackQueue)
             slackThreads.append(slackWorker)
             slackWorker.daemon = True
@@ -110,27 +112,24 @@ def do_scrape():
                 threadResults = worker.join()
                 for result in threadResults:
                     allCraigslistResults[city].append(result)
-            Jobthreads *= 0
-
-            foundString = "Found: {} results for this city: {} ".format(len(allCraigslistResults[city]),city)
-            print(foundString)
-
-            for result in allCraigslistResults[city]:
-                slackQueue.put((sc,city,result))
+                    slackQueue.put((sc,city,result))
             for worker in slackThreads:
                 worker.join()
+            Jobthreads *= 0
             slackThreads *= 0
+
+            foundString = "Found: {} results for : {} ".format(len(allCraigslistResults[city]),city)
+            print(foundString)
 
     # THIS IS INDEED:
     if useIndeed:
         jobQueue = Queue()
         slackQueue = Queue()
-        for i in range(2):
+        for i in range(4):
             worker = indeedWorker(jobQueue)
             Jobthreads.append(worker)
             worker.daemon = True
             worker.start()
-        for i in range(2):
             worker = slackPostWorkerIN(slackQueue)
             slackThreads.append(worker)
             worker.daemon = True
@@ -144,12 +143,10 @@ def do_scrape():
                 threadResults = worker.join()
                 for result in threadResults:
                     allIndeedResults[city].append(result)
+                    slackQueue.put((sc,city,result))
             Jobthreads *= 0
-
-            testString = "Found: {} results for this city: {} ".format(len(allIndeedResults[city]),city)
-            print(testString)
-
-            for result in allIndeedResults[city]:
-                slackQueue.put((sc,city,result))
             for worker in slackThreads:
                 worker.join()
+
+            testString = "Found: {} results for : {} ".format(len(allIndeedResults[city]),city)
+            print(testString)
