@@ -28,7 +28,8 @@ def scrape_area_indeed(keyword,searchcity):
                 title = result['jobtitle'],
                 location = result["formattedLocationFull"],
                 JobKeyOrID = result["jobkey"],
-                city = searchcity
+                city = searchcity,
+                InorCl = "IN"
             )
             #Save Session:
             try:
@@ -62,16 +63,19 @@ def scrape_area_jobs(area,searchcity,jobcategory):
                 name = result["name"],
                 location = result["where"],
                 city = searchcity,
-                JobKeyOrID = result['id']
+                JobKeyOrID = result['id'],
+                InorCl = "CL"
             )
             #Save Session:
             try:
                 db.session.add(listing)
                 db.session.commit()
-                db.session.close()
             except Exception as inst:
                 print(inst)
                 print("Error DB")
+                db.session.rollback()
+            finally:
+                db.session.close()
             RESULTS.append(result)
     return RESULTS
 

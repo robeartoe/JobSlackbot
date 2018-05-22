@@ -13,30 +13,65 @@
     <div class="container">
       <div class="row">
         <div class="col">
-          <div class="jumbotron">
+          <div class="jumbotron" style="padding-top:10px;padding-bottom:10px;">
             <h1 class="display-5">SlackBot Settings:</h1>
             <p class="lead">Allows you to set cities,services and keywords.</p>
             <a href="/" class="btn btn-primary btn-lg btn-block" role="button" aria-pressed="true">View Listings</a>
-
           </div>
         </div>
       </div>
       <div class="row">
         <div class="col">
+          <div id="alert">
+            <!-- TODO: Add bootstrap 4 alerts here. -->
+          </div>
           <form class="" action="update" method="post" >
             <div class="row">
               <div class="col-3">
                 <div class="form-check">
+                  {%if clSetting%}
+                  <input class="form-check-input" type="checkbox" value="" id="clcheck" data-toggle="toggle" checked="checked">
+                  {%else%}
                   <input class="form-check-input" type="checkbox" value="" id="clcheck" data-toggle="toggle">
+                  {%endif%}
                   <label class="form-check-label" for="clcheck">
                     <h4>Craigslist</h4>
                   </label>
                 </div>
               </div>
+              {% if inSetting %}
+              <div class="col-9" id="clform">
+              {% else %}
               <div class="col-9" id="clform" style="display:none;">
+              {% endif %}
                 <div id="clList">
-
-                </div>
+                  <!-- TODO: Create Table of existing Entries. Allow for deleting. -->
+                  {% if clQuery is defined and clQuery is not none %}
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">City</th>
+                        <th scope="col">area</th>
+                        <th scope="col">category</th>
+                        <th scope="col">Slack Channel</th>
+                        <th scope="col">Internship</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for query in inQuery %}
+                      <tr>
+                        <th scope="col">{{loop.index}}</th>
+                        <th scope="col">{{query.city}}</th>
+                        <th scope="col">{{query.area}}</th>
+                        <th scope="col">{{query.category}}</th>
+                        <th scope="col">{{query.internship}}</th>
+                        <th scope="col">{{query.slackChannel}}</th>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  {% endif %}                </div>
                 <div class="form-group" >
                   <label for="clCities">Cities:</label>
                   <input type="text" class="form-control" id="clCities" placeholder="losangeles">
@@ -66,15 +101,45 @@
             <div class="row">
               <div class="col-3">
                 <div class="form-check">
+                  {% if clSetting %}
+                  <input class="form-check-input" type="checkbox" value="" id="incheck" checked="checked">
+                  {%else%}
                   <input class="form-check-input" type="checkbox" value="" id="incheck">
+                  {%endif%}
                   <label class="form-check-label" for="incheck">
                     <h4>Indeed</h4>
                   </label>
                 </div>
               </div>
+              {% if clSetting %}
+              <div class="col-9" id="indeedform" >
+              {% else %}
               <div class="col-9" id="indeedform" style="display:none;">
+              {% endif %}
                 <div class="inList">
-
+                  <!-- TODO: Create Table of existing Entries. Allow for deleting. -->
+                  {% if inQuery is defined and inQuery is not none %}
+                  <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">City</th>
+                        <th scope="col">Keyword</th>
+                        <th scope="col">Slack Channel</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for query in inQuery %}
+                      <tr>
+                        <th scope="col">{{loop.index}}</th>
+                        <th scope="col">{{query.city}}</th>
+                        <th scope="col">{{query.keyword}}</th>
+                        <th scope="col">{{query.slackChannel}}</th>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table>
+                  {% endif %}
                 </div>
                 <div class="form-group">
                   <label for="indeedCities">Cities:</label>
@@ -93,7 +158,7 @@
             </div>
             <hr>
             <div class="row">
-              <button class="btn btn-primary" type="submit">Update Settings</button>
+              <a class="btn btn-primary active" role="button" onclick="update();">Update Settings</a>
             </div>
           </form>
         </div>

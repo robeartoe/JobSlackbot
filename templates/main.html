@@ -37,12 +37,22 @@
                     <th scope="col">#</th>
                     <th scope="col">Title</th>
                     <th scope="col">City</th>
-                    <th scope="col">URL</th>
+                    <th scope="col">Location</th>
                     <th scope="col">Date</th>
                   </tr>
                 </thead>
                 <tbody>
-
+                    {% if inListing is defined %}
+                      {% for listing in inListing %}
+                      <tr>
+                        <th scope="col">{{loop.index}}</th>
+                        <th scope="col"><a href="{{listing.link}}">{{listing.title}}</a></th>
+                        <th scope="col">{{listing.city}}</th>
+                        <th scope="col">{{listing.location}}</th>
+                        <th scope="col">{{listing.created}}</th>
+                      </tr>
+                      {% endfor %}
+                    {% endif %}
                 </tbody>
               </table>
             </div>
@@ -53,12 +63,22 @@
                     <th scope="col">#</th>
                     <th scope="col">Title</th>
                     <th scope="col">City</th>
-                    <th scope="col">URL</th>
+                    <th scope="col">Location</th>
                     <th scope="col">Date</th>
                    </tr>
                 </thead>
                 <tbody>
-
+                  {% if clListings is defined %}
+                    {% for listing in clListings %}
+                    <tr>
+                      <th scope="col">{{loop.index}}</th>
+                      <th scope="col"><a href="{{listing.link}}">{{listing.name}}</a></th>
+                      <th scope="col">{{listing.city}}</th>
+                      <th scope="col">{{listing.location}}</th>
+                      <th scope="col">{{listing.created}}</th>
+                    </tr>
+                    {% endfor %}
+                  {% endif %}
                 </tbody>
               </table>
             </div>

@@ -19,3 +19,32 @@ $(document).ready(function() {
       })
      })
 });
+
+function update(){
+  $.post('/update',{
+
+  }).done(function(update){
+
+  }).fail(function(update){
+  })
+};
+
+function add(){
+  $.post('/update',{
+
+  }).done(function(add){
+
+  }).fail(function(add){
+
+  })
+};
+
+function deleteRow(){
+  $.post('/update',{
+
+  }).done(function(deleteRow){
+
+  }).fail(function(deleteRow){
+
+  })
+};

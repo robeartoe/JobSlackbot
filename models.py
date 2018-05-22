@@ -16,6 +16,7 @@ class Listing(db.Model):
     location = db.Column(db.String(400)) #'formattedLocation', and 'where' for craigslist
     city = db.Column(db.String(400)) #Los Angeles or New York
     JobKeyOrID = db.Column(db.String(400), unique=True) #'jobkey' for Indeed and 'id' for Craigslist
+    InorCl = db.Column(db.String(400))
 
 class Settings(db.Model):
     """
@@ -32,9 +33,7 @@ class indeedModel(db.Model):
     __tablename__="indeedModel"
     id = db.Column(db.Integer,primary_key=True)
     city = db.Column(db.String(400))
-    area = db.Column(db.String(400))
-    category = db.Column(db.String(400))
-    internship = db.Column(db.Boolean)
+    keyword = db.Column(db.String(400))
     slackChannel = db.Column(db.String(400))
     user_id = db.Column(db.Integer,db.ForeignKey('settings.id'))
 
@@ -42,6 +41,8 @@ class craigslistModel(db.Model):
     __tablename__="craigslistModel"
     id = db.Column(db.Integer,primary_key=True)
     city = db.Column(db.String(400))
-    keyword = db.Column(db.String(400))
+    area = db.Column(db.String(400))
+    category = db.Column(db.String(400))
+    internship = db.Column(db.Boolean)
     slackChannel = db.Column(db.String(400))
     user_id = db.Column(db.Integer,db.ForeignKey('settings.id'))
