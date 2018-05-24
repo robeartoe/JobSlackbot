@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime
 
 class EZIndeed(object):
     """docstring for EZIndeed."""
@@ -45,7 +46,7 @@ class JobListing(object):
         self.company = job['company']
         self.snippet = job['snippet']
         self.RelativeTime = job['formattedRelativeTime']
-        self.date = job['date']
+        self.date = self.getFormatDate(job['date'])
         self.city = job['city']
         self.url = job['url']
 
@@ -53,3 +54,6 @@ class JobListing(object):
         return '<JobListing Object>'
     def __str__(self):
         return str(self.result)
+    def getFormatDate(self,date):
+        date = datetime.strptime(date,'%a, %d %b %Y %X %Z')
+        return date.strftime('%d %b %Y')

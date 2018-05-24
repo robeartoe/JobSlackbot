@@ -9,7 +9,7 @@ from flask import Flask, request,render_template,url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import sqlalchemy
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine,desc
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import sessionmaker, scoped_session
 
@@ -28,41 +28,22 @@ from models import Settings, Listing, indeedModel,craigslistModel
 
 @app.route("/")
 def main():
-    # Get Listings from both Indeed and Craigslist:
-    # Two Variables, put as parameters for jinja.
     if userSettings:
         inSetting = Settings.query.get(1).indeed
         clSetting = Settings.query.get(1).craigslist
-    if inSetting and clSetting:
-        inListing = Listing.query.filter_by(InorCl="IN").limit(50).all()
-        clListings = Listing.query.filter_by(InorCl="CL").limit(50).all()
-        return render_template("main.html",inListing=inListing,clListings=clListings)
-    elif inSetting:
-        inListing = Listing.query.filter_by(InorCl="IN").limit(50).all()
-        return render_template("main.html",inListing=inListing)
-    elif clSetting:
-        clListings = Listing.query.filter_by(InorCl="CL").limit(50).all()
-        return render_template("main.html",clListings=clListings)
-    else:
-        return render_template("main.html")
-
+    inListing = Listing.query.filter_by(InorCl="IN").order_by(desc(Listing.created)).limit(50).all()
+    clListings = Listing.query.filter_by(InorCl="CL").order_by(desc(Listing.created)).limit(50).all()
+    return render_template("main.html",inListing=inListing,clListings=clListings)
+    
 @app.route("/settings")
 def settings():
     if userSettings:
         inSetting = Settings.query.get(1).indeed
         clSetting = Settings.query.get(1).craigslist
-    if inSetting and clSetting:
-        clQuery = craigslistModel.query.all()
-        inQuery = indeedModel.query.all()
-        return render_template("settings.html",inSetting=inSetting,clSetting=clSetting,inQuery=inQuery,clQuery=clQuery)
-    elif inSetting:
-        inQuery = indeedModel.query.all()
-        return render_template("settings.html",inSetting=inSetting,clSetting=clSetting,inQuery=inQuery)
-    elif clSetting:
-        clQuery = craigslistModel.query.all()
-        return render_template("settings.html",inSetting=inSetting,clSetting=clSetting)
-    else:
-        return render_template("settings.html",inSetting=inSetting,clSetting=clSetting)
+    clQuery = craigslistModel.query.all()
+    inQuery = indeedModel.query.all()
+    return render_template("settings.html",inSetting=inSetting,clSetting=clSetting,inQuery=inQuery,clQuery=clQuery)
+
 
 @app.route("/update",methods=["POST"])
 def update():
@@ -70,15 +51,20 @@ def update():
     if status == "updateService":
         setting = Settings.query.get(1)
         if request.form['service'] == "craigslist":
-            Settings.craigslist = request.form["currSetting"]
+            if request.form['currSetting'] == '1':
+                setting.craigslist = True
+            else:
+                setting.craigslist = False
             db.session.commit()
             db.session.close()
-            print(Settings.craigslist)
-            print(request.form["currSetting"])
             return json.dumps({'status':'OK','Service':request.form["currSetting"]})
         else:
-            Settings.indeed = request.form["currSetting"]
+            if request.form['currSetting'] == '1':
+                setting.indeed = True
+            else:
+                setting.indeed = False
             db.session.commit()
+            db.session.close()
             return json.dumps({'status':'OK'})
 
     elif status == "addRow":

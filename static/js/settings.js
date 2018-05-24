@@ -30,15 +30,11 @@ function update(service,currSetting){
     currSetting:currSetting,
     status:"updateService"
   }).done(function(update){
-    $("#alert").addClass('alert alert-success fade show alert-dismissable');
-    $("#alert").attr('role','alert');
-    $(".alert").alert("Service has been changed successfully!");
-    // $("#alert").append("Service has been changed successfully!");
-    // $("#alertButton").show();
+    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Service has been changed successfully!</span></div>')
+    $(".alert").alert();
   }).fail(function(update){
-    $("#alert").addClass('alert alert-danger fade show alert-dismissable');
-    $("#alert").attr('role','alert');
-    $("#alert").text("Service has failed to change!");
+    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Service has failed to change!</span></div>')
+    $(".alert").alert();
   })
   return false;
 };
@@ -49,14 +45,12 @@ function add(){
     service:service,
     status:"addRow"
   }).done(function(add){
-    $("#alert").addClass('alert alert-success fade show alert-dismissable');
-    $("#alert").attr('role','alert');
-    $("#alert").append("Row has been added successfully!");
+    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Row has been added successfully!</span></div>')
+    $(".alert").alert();
 
   }).fail(function(add){
-    $("#alert").addClass('alert alert-danger fade show alert-dismissable');
-    $("#alert").attr('role','alert');
-    $("#alert").append("Row has failed to add!");
+    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Row has failed to add!</span></div>')
+    $(".alert").alert();
   })
   return false;
 };
@@ -67,14 +61,12 @@ function deleteRow(){
     service:service,
     status:"deleteRow"
   }).done(function(deleteRow){
-    $("#alert").addClass('alert alert-success fade show alert-dismissable');
-    $("#alert").attr('role','alert');
-    $("#alert").append("Row has been deleted successfully!");
+    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Row has been deleted successfully!</span></div>')
+    $(".alert").alert();
 
   }).fail(function(deleteRow){
-    $("#alert").addClass('alert alert-danger fade show alert-dismissable');
-    $("#alert").attr('role','alert');
-    $("#alert").append("Row has failed to delete!");
+    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Row has failed to delete!</span></div>')
+    $(".alert").alert();
   })
   return false;
 };
