@@ -22,24 +22,28 @@
       </div>
       <div class="row">
         <div class="col">
-          <div id="alert">
+          <div id="alert" class="alert alert-success fade show alert-dismissable">
             <!-- TODO: Add bootstrap 4 alerts here. -->
+            <button id="alertButton" style="display:none" type="button" class="close" data-dismiss="alert" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
           <form class="" action="update" method="post" >
             <div class="row">
               <div class="col-3">
                 <div class="form-check">
-                  {%if clSetting%}
+                  {%if clSetting == 1%}
                   <input class="form-check-input" type="checkbox" value="" id="clcheck" data-toggle="toggle" checked="checked">
                   {%else%}
-                  <input class="form-check-input" type="checkbox" value="" id="clcheck" data-toggle="toggle">
+                  <input class="form-check-input" type="checkbox" value="" id="clcheck" data-toggle="toggle" checked="no">
                   {%endif%}
                   <label class="form-check-label" for="clcheck">
                     <h4>Craigslist</h4>
+                    {{clSetting}}
                   </label>
                 </div>
               </div>
-              {% if inSetting %}
+              {% if clSetting%}
               <div class="col-9" id="clform">
               {% else %}
               <div class="col-9" id="clform" style="display:none;">
@@ -101,7 +105,7 @@
             <div class="row">
               <div class="col-3">
                 <div class="form-check">
-                  {% if clSetting %}
+                  {% if inSetting %}
                   <input class="form-check-input" type="checkbox" value="" id="incheck" checked="checked">
                   {%else%}
                   <input class="form-check-input" type="checkbox" value="" id="incheck">
@@ -111,7 +115,7 @@
                   </label>
                 </div>
               </div>
-              {% if clSetting %}
+              {% if inSetting %}
               <div class="col-9" id="indeedform" >
               {% else %}
               <div class="col-9" id="indeedform" style="display:none;">
@@ -156,15 +160,11 @@
                 <a href="#" class="btn btn-primary" role="button" aria-pressed="true">Add</a>
               </div>
             </div>
-            <hr>
-            <div class="row">
-              <a class="btn btn-primary active" role="button" onclick="update();">Update Settings</a>
-            </div>
           </form>
         </div>
       </div>
     </div>
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <!-- Personal JS -->

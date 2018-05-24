@@ -1,4 +1,4 @@
-import time, traceback, sys, logging
+import time, traceback, sys, logging,json
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -64,10 +64,30 @@ def settings():
     else:
         return render_template("settings.html",inSetting=inSetting,clSetting=clSetting)
 
-@app.route("/update",methods=["GET","POST"])
+@app.route("/update",methods=["POST"])
 def update():
-    success = True
-    return render_template("update.html",success=success)
+    status = request.form['status']
+    if status == "updateService":
+        setting = Settings.query.get(1)
+        if request.form['service'] == "craigslist":
+            Settings.craigslist = request.form["currSetting"]
+            db.session.commit()
+            db.session.close()
+            print(Settings.craigslist)
+            print(request.form["currSetting"])
+            return json.dumps({'status':'OK','Service':request.form["currSetting"]})
+        else:
+            Settings.indeed = request.form["currSetting"]
+            db.session.commit()
+            return json.dumps({'status':'OK'})
+
+    elif status == "addRow":
+        serivce = Settings.query.get(1)
+        pass
+
+    elif status == "deleteRow":
+        pass
+    pass
 
 @app.route("/scrape")
 def scrape():
