@@ -34,7 +34,7 @@ def main():
     inListing = Listing.query.filter_by(InorCl="IN").order_by(desc(Listing.created)).limit(50).all()
     clListings = Listing.query.filter_by(InorCl="CL").order_by(desc(Listing.created)).limit(50).all()
     return render_template("main.html",inListing=inListing,clListings=clListings)
-    
+
 @app.route("/settings")
 def settings():
     if userSettings:
@@ -47,19 +47,21 @@ def settings():
 
 @app.route("/update",methods=["POST"])
 def update():
-    status = request.form['status']
+    status = request.json['status']
+    print(request.get_json())
+
     if status == "updateService":
         setting = Settings.query.get(1)
-        if request.form['service'] == "craigslist":
-            if request.form['currSetting'] == '1':
+        if request.json['service'] == "craigslist":
+            if request.json['currSetting']:
                 setting.craigslist = True
             else:
                 setting.craigslist = False
             db.session.commit()
             db.session.close()
-            return json.dumps({'status':'OK','Service':request.form["currSetting"]})
+            return json.dumps({'status':'OK'})
         else:
-            if request.form['currSetting'] == '1':
+            if request.json['currSetting']:
                 setting.indeed = True
             else:
                 setting.indeed = False
@@ -68,12 +70,32 @@ def update():
             return json.dumps({'status':'OK'})
 
     elif status == "addRow":
-        serivce = Settings.query.get(1)
-        pass
-
+        userSetting = Settings.query.get(1)
+        if request.json['service'] == "craigslist":
+            if request.json['internship'] == '0':
+                internship = False
+            else:
+                internship = True
+            for area in request.json['areas']:
+                for category in request.json['categories']:
+                    clEntry = craigslistModel(user_id=userSetting.id,
+                                            city=request.json['city'],
+                                            area=area,
+                                            internship=internship,
+                                            category=category,
+                                            slackChannel=request.json['sChannel'])
+                    db.session.add(clEntry)
+        else:
+            for keys in request.json["keywords"]:
+                inEntry = indeedModel(user_id=userSetting.id,
+                                    city=request.json['city'],
+                                    keyword=keys,
+                                    slackChannel=request.json['sChannel'])
+                db.session.add(inEntry)
+        db.session.commit()
     elif status == "deleteRow":
         pass
-    pass
+    return json.dumps({'status':'FAIL'})
 
 @app.route("/scrape")
 def scrape():

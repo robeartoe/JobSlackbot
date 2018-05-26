@@ -25,48 +25,113 @@ $(document).ready(function() {
 });
 
 function update(service,currSetting){
-  $.post('/update',{
+  parms={
     service:service,
     currSetting:currSetting,
     status:"updateService"
-  }).done(function(update){
-    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Service has been changed successfully!</span></div>')
-    $(".alert").alert();
-  }).fail(function(update){
-    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Service has failed to change!</span></div>')
-    $(".alert").alert();
-  })
+  };
+  $.ajax({
+    type:"POST",
+    url:"/update",
+    async:false,
+    data:JSON.stringify(parms,null,'\t'),
+    contentType: 'application/json;charset=UTF-8',
+    success:function(){
+      SuccessAlert("Service","changed");
+    },
+    error:function(){
+      FailureAlert("Service","change");
+    }
+  });
   return false;
 };
 
-function add(){
-  $.post('/update',{
-
-    service:service,
-    status:"addRow"
-  }).done(function(add){
-    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Row has been added successfully!</span></div>')
-    $(".alert").alert();
-
-  }).fail(function(add){
-    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Row has failed to add!</span></div>')
-    $(".alert").alert();
-  })
+function add(service){
+  if (service == "craigslist") {
+    var cities = $('#clCities').val();
+    var Areas = $("#clAreas").val().split(',');
+    var Categories = $("#clCategories").val().split(',');
+    var internship = $("#clIntern").is(':checked')?1:0;
+    var slack = $("#clslack").val();
+    console.log(cities,Areas,Categories,internship,slack);
+    parms={
+      service:service,
+      status:"addRow",
+      city:cities,
+      areas:Areas,
+      categories:Categories,
+      internship:internship,
+      sChannel:slack
+    };
+    $.ajax({
+      type:"POST",
+      url:"/update",
+      async:false,
+      data:JSON.stringify(parms,null,'\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success:function(){
+        SuccessAlert("Row","added");
+      },
+      error:function(){
+        FailureAlert("Row","add");
+      }
+    });
+  }
+  else{
+    var cities = $('#indeedCities').val();
+    var keywords = $("#indeedKeywords").val().split(',');
+    var slack = $("#inSlack").val();
+    console.log(cities,keywords,slack);
+    parms={
+      service:service,
+      status:"addRow",
+      city:cities,
+      keywords:keywords,
+      sChannel:slack
+    }
+    $.ajax({
+      type:"POST",
+      url:"/update",
+      async:false,
+      data:JSON.stringify(parms,null,'\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success: function(){
+        SuccessAlert("Row","added");
+      },
+      error: function(){
+        FailureAlert("Row","add");
+      }
+    });
+  }
   return false;
 };
 
-function deleteRow(){
+function deleteRow(service){
+  if (serivce == "craigslist") {
+
+  }
+  else{
+
+  }
+
   $.post('/update',{
 
     service:service,
     status:"deleteRow"
   }).done(function(deleteRow){
-    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Row has been deleted successfully!</span></div>')
-    $(".alert").alert();
-
+    SuccessAlert("Row","deleted");
   }).fail(function(deleteRow){
-    $('#alert').html('<div class = "alert alert-success fade show alert-dismissable" role="alert"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button><span>Row has failed to delete!</span></div>')
-    $(".alert").alert();
+    FailureAlert("Row","delete");
   })
   return false;
 };
+
+function SuccessAlert(eventType,eventAction){
+  $('#alert').html("<div class = 'alert alert-success fade show alert-dismissable' role='alert'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button><span>" + eventType + " has been " + eventAction + " successfully!</span></div>");
+  $(".alert").alert();
+}
+
+function FailureAlert(eventType,eventAction){
+  $('#alert').html("<div class = 'alert alert-danger fade show alert-dismissable' role='alert'><button type='button' class='close' data-dismiss='alert' aria-hidden='true'>&times;</button><span>" + eventType + " has failed to " + eventAction + "!</span></div>" );
+  $(".alert").alert();
+}
