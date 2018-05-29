@@ -4,14 +4,15 @@ class indeedWorker(Thread):
     def __init__(self,queue):
         Thread.__init__(self)
         self.queue = queue
-        self.RESULTS = []
+        self.RESULTS = {}
     def run(self):
         while True:
             # Get parameters from tuple:
-            keyword,searchcity = self.queue.get()
+            keyword,searchcity,query = self.queue.get()
             # Perform Slack Post:
             from scrape import scrape_area_indeed
-            self.RESULTS.extend(scrape_area_indeed(keyword=keyword,searchcity=searchcity))
+            self.RESULTS['result'] = (scrape_area_indeed(keyword=keyword,searchcity=searchcity))
+            self.RESULTS['query'] = query
             # Update Queue:
             self.queue.task_done()
     def join(self):
@@ -25,10 +26,10 @@ class slackPostWorkerIN(Thread):
     def run(self):
         while True:
             # Get parameters from tuple:
-            sc, city, result = self.queue.get()
+            sc, listings, inRow = self.queue.get()
             # Perform Slack Post:
             from util import postFromIndeed
-            postFromIndeed(sc,city,result)
+            postFromIndeed(sc,listings,inRow)
             # Update Queue:
             self.queue.task_done()
     def join(self):

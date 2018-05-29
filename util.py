@@ -7,7 +7,7 @@ import settings
 def postFromIndeed(sc,listings,inRow):
     for listing in listings:
         try:
-            description = "{}|{}|{}|{}|<{}>".format(listing.location, listing.title, listing.url,
+            description = "{}|{}|{}|{}|<{}>".format(listing.location, listing.title, listing.link,
                                             listing.name, listing.created)
             sc.api_call(
             "chat.postMessage", channel=inRow.slackChannel, text=description,
@@ -20,7 +20,7 @@ def postFromIndeed(sc,listings,inRow):
 def postFromCraiglist(sc,listings,clRow):
     for listing in listings:
         try:
-            description = "{}|{}|{}|<{}>".format(listing.location, listing.title, listing.url, listing.created)
+            description = "{}|{}|{}|<{}>".format(listing.location, listing.title, listing.link, listing.created)
             sc.api_call(
             "chat.postMessage", channel=clRow.slackChannel, text=description,
             username='pybot', icon_emoji=clRow.icon

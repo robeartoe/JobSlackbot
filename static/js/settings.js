@@ -83,8 +83,8 @@ function add(service){
     var cities = $('#indeedCities').val();
     var keywords = $("#indeedKeywords").val().split(',');
     var slack = $("#inSlack").val();
-    var icon = $("#inIcon").val();
-    console.log(cities,keywords,slack);
+    var icon = $("#InIcon").val();
+    console.log(cities,keywords,slack,icon);
     parms={
       service:service,
       status:"addRow",

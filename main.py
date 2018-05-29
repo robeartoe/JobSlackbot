@@ -19,8 +19,8 @@ login = LoginManager(app)
 login.login_view ='login'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['DEBUG'] = True
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = os.environ['SQLALCHEMY_TRACK_MODIFICATIONS']
+app.config['DEBUG'] = os.environ['DEBUG']
 app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 
 db = SQLAlchemy(app)
@@ -120,6 +120,8 @@ def update():
                                     icon=request.json['icon'])
                 db.session.add(inEntry)
         db.session.commit()
+        db.session.close()
+
     elif status == "deleteRow":
         if request.json['service'] == 'craigslist':
             if request.json['internship'] == 'True':
@@ -134,12 +136,15 @@ def update():
 
             db.session.delete(row)
             db.session.commit()
+            db.session.close()
         else:
             row = indeedModel.query.filter_by(city = request.json['city'],
                                                 keyword=request.json['keyword'],
                                                 slackChannel=request.json['slackChannel']).first()
             db.session.delete(row)
             db.session.commit()
+            db.session.close()
+
     return json.dumps({'status':'FAIL'})
 
 @app.route("/scrape")
