@@ -108,14 +108,16 @@ def update():
                                             area=area,
                                             internship=internship,
                                             category=category,
-                                            slackChannel=request.json['sChannel'])
+                                            slackChannel=request.json['sChannel'],
+                                            icon=request.json['icon'])
                     db.session.add(clEntry)
         else:
             for keys in request.json["keywords"]:
                 inEntry = indeedModel(user_id=userSetting.id,
                                     city=request.json['city'],
                                     keyword=keys,
-                                    slackChannel=request.json['sChannel'])
+                                    slackChannel=request.json['sChannel'],
+                                    icon=request.json['icon'])
                 db.session.add(inEntry)
         db.session.commit()
     elif status == "deleteRow":

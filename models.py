@@ -49,6 +49,7 @@ class indeedModel(db.Model):
     city = db.Column(db.String(400))
     keyword = db.Column(db.String(400))
     slackChannel = db.Column(db.String(400))
+    icon = db.Column(db.String(128))
     user_id = db.Column(db.Integer,db.ForeignKey('settings.id'))
 
 class craigslistModel(db.Model):
@@ -59,4 +60,5 @@ class craigslistModel(db.Model):
     category = db.Column(db.String(400))
     internship = db.Column(db.Boolean)
     slackChannel = db.Column(db.String(400))
+    icon = db.Column(db.String(128))
     user_id = db.Column(db.Integer,db.ForeignKey('settings.id'))

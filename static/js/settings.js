@@ -53,7 +53,8 @@ function add(service){
     var Categories = $("#clCategories").val().split(',');
     var internship = $("#clIntern").is(':checked')?1:0;
     var slack = $("#clslack").val();
-    console.log(cities,Areas,Categories,internship,slack);
+    var icon = $("#clIcon").val();
+    console.log(cities,Areas,Categories,internship,slack,icon);
     parms={
       service:service,
       status:"addRow",
@@ -61,7 +62,8 @@ function add(service){
       areas:Areas,
       categories:Categories,
       internship:internship,
-      sChannel:slack
+      sChannel:slack,
+      icon:icon
     };
     $.ajax({
       type:"POST",
@@ -81,13 +83,15 @@ function add(service){
     var cities = $('#indeedCities').val();
     var keywords = $("#indeedKeywords").val().split(',');
     var slack = $("#inSlack").val();
+    var icon = $("#inIcon").val();
     console.log(cities,keywords,slack);
     parms={
       service:service,
       status:"addRow",
       city:cities,
       keywords:keywords,
-      sChannel:slack
+      sChannel:slack,
+      icon:icon
     }
     $.ajax({
       type:"POST",
@@ -119,6 +123,7 @@ function deleteRow(service,row){
         category: tds[2].outerText,
         internship: tds[3].outerText,
         slackChannel: tds[4].outerText,
+        icon:tds[5].outerText,
         service:service,
         status:"deleteRow"
     };
@@ -146,6 +151,7 @@ function deleteRow(service,row){
         city: tds[0].outerText,
         keyword: tds[1].outerText,
         slackChannel: tds[2].outerText,
+        icon:tds[3].outerText,
         service:service,
         status:"deleteRow"
     };

@@ -33,19 +33,20 @@ class slackPostWorkerIN(Thread):
             self.queue.task_done()
     def join(self):
         self.queue.join()
+# --------------------------------------------------------#
+# Craigslist:
 
 class slackPostWorkerCL(Thread):
     def __init__(self,queue):
         Thread.__init__(self)
         self.queue = queue
-
     def run(self):
         while True:
             # Get parameters from tuple:
-            sc, city, listing = self.queue.get()
+            sc,listing,query = self.queue.get()
             # Perform Slack Post:
             from util import postFromCraiglist
-            postFromCraiglist(sc=sc,city=city,listing=listing)
+            postFromCraiglist(sc=sc,listings=listing,clRow=query)
             # Update Queue:
             self.queue.task_done()
     def join(self):
@@ -55,15 +56,15 @@ class craigslistWorker(Thread):
     def __init__(self,queue):
         Thread.__init__(self)
         self.queue = queue
-        self.RESULTS = []
-
+        self.RESULTS = {}
     def run(self):
         while True:
             # Get parameters from tuple:
-            area, city, jobC = self.queue.get()
+            area, city, jobC,internship,query = self.queue.get()
             # Search Craigslist:
             from scrape import scrape_area_jobs
-            self.RESULTS = scrape_area_jobs(area=area, searchcity=city, jobcategory=jobC)
+            self.RESULTS['result'] = scrape_area_jobs(area=area, searchcity=city, jobcategory=jobC,internship=internship)
+            self.RESULTS['query'] = query
             # Update Queue:
             self.queue.task_done()
     def join(self):

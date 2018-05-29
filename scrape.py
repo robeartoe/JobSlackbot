@@ -8,13 +8,13 @@ from slackclient import SlackClient
 from settings import JobKeywords,cities,jobCategorys,want_internship,Craigslistcities,areas,useIndeed,useCraigslist,resultNumber,slackToken,indeedToken
 
 from main import db
-from models import Listing
+from models import Listing,Settings,indeedModel,craigslistModel
 
 def scrape_area_indeed(keyword,searchcity):
     #Can use JobKey to see whether or not it's in the database
     RESULTS = []
     api = EZIndeed(indeedToken)
-    json_results = api.search(keyword=keyword,limit =1, location = searchcity, full = True)
+    json_results = api.search(keyword=keyword,limit = 1, location = searchcity, full = True)
 
     for result in json_results['results']:
         listing = Listing.query.filter_by(JobKeyOrID = result["jobkey"]).first()
@@ -43,10 +43,10 @@ def scrape_area_indeed(keyword,searchcity):
             RESULTS.append(result)
     return RESULTS
 
-def scrape_area_jobs(area,searchcity,jobcategory):
+def scrape_area_jobs(area,searchcity,jobcategory,internship):
     cl_j = CraigslistJobs(site = searchcity, area = area, category = jobcategory,
-                            filters={'is_internship': want_internship})
-    genJ = cl_j.get_results(sort_by = 'newest', geotagged = True, limit = resultNumber)
+                            filters={'is_internship': internship})
+    genJ = cl_j.get_results(sort_by = 'newest', geotagged = True, limit = 1)
     RESULTS = []
     while True:
         try:
@@ -69,6 +69,7 @@ def scrape_area_jobs(area,searchcity,jobcategory):
             )
             #Save Session:
             try:
+                RESULTS.append(listing)
                 db.session.add(listing)
                 db.session.commit()
             except Exception as inst:
@@ -77,57 +78,59 @@ def scrape_area_jobs(area,searchcity,jobcategory):
                 db.session.rollback()
             finally:
                 db.session.close()
-            RESULTS.append(result)
     return RESULTS
 
 #This function will start the scraper. And post to slack.
 def do_scrape():
     #Create a slack client
     sc = SlackClient(slackToken)
-    allIndeedResults = {}
-    allCraigslistResults = {}
+
+    settings = Settings.query.get(1)
+
+    # allIndeedResults = {}
+    # allCraigslistResults = {}
     #Get all the results from craigslist
     #This will iterate through areas, in settings.
     Jobthreads = []
     slackThreads = []
 
-
     # THIS IS CRAIGSLIST:
     #For loop for cities, and for loop for the areas in said cities
-    if useCraigslist:
+    if settings.craigslist:
+        numResults = 0
         jobQueue = Queue()
         slackQueue = Queue()
+        resultQueue = Queue()
         for i in range(4):
             worker = craigslistWorker(jobQueue)
             Jobthreads.append(worker)
             worker.daemon = True
             worker.start()
+
             slackWorker = slackPostWorkerCL(slackQueue)
             slackThreads.append(slackWorker)
             slackWorker.daemon = True
             slackWorker.start()
 
-        for city in Craigslistcities:
-            allCraigslistResults[city] = []
-            for area in areas[city]:
-                for jobcategory in jobCategorys:
-                    jobQueue.put((area,city,jobcategory))
+        clQueries = craigslistModel.query.all()
+        for query in clQueries:
+            jobQueue.put((query.area,query.city,query.category,query.internship,query))
+        for worker in Jobthreads:
+            results = worker.join()
+            if results:
+                slackQueue.put((sc,results['result'],results['query']))
+                foundString = "Found: {} results for : {} ".format(len(results['result']),results['query'].city)
+                print(foundString)
+        for worker in slackThreads:
+            worker.join()
 
-            for worker in Jobthreads:
-                threadResults = worker.join()
-                for result in threadResults:
-                    allCraigslistResults[city].append(result)
-                    slackQueue.put((sc,city,result))
-            for worker in slackThreads:
-                worker.join()
-            Jobthreads *= 0
-            slackThreads *= 0
+        Jobthreads *= 0
+        slackThreads *= 0
 
-            foundString = "Found: {} results for : {} ".format(len(allCraigslistResults[city]),city)
-            print(foundString)
+
 
     # THIS IS INDEED:
-    if useIndeed:
+    if settings.indeed:
         jobQueue = Queue()
         slackQueue = Queue()
         for i in range(4):

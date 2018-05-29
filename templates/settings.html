@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8">
     <title>Indeed/Craigslist SlackBot Settings</title>
-
     <!-- Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Oswald|Raleway" rel="stylesheet">
     <!-- font-awesome -->
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+
  </head>
   <body>
     <div class="container">
@@ -58,6 +58,7 @@
                         <th scope="col">Category</th>
                         <th scope="col">Internship</th>
                         <th scope="col">Slack Channel</th>
+                        <th scope="col">Icon</th>
                         <th scope="col">Delete</th>
                       </tr>
                     </thead>
@@ -70,6 +71,7 @@
                         <td >{{query.category}}</th>
                         <td >{{query.internship}}</th>
                         <td >{{query.slackChannel}}</th>
+                        <td> {{query.icon}} </th>
                         <td > <a href="#" onclick="return deleteRow('craigslist','CL{{loop.index}}');"> <i class="fas fa-trash-alt"></i> </a> </th>
                       </tr>
                       {% endfor %}
@@ -97,6 +99,10 @@
                 <div class="form-group">
                   <label for="clslack">Slack Channel: </label>
                   <input type="text" class="form-control" id="clslack" placeholder="#losangeles">
+                </div>
+                <div class="form-group">
+                  <label for="clIcon">Icon: </label>
+                  <input type="text" class="form-control" id="clIcon" placeholder=":briefcase:">
                 </div>
                 <a href="" class="btn btn-primary" role="button" aria-pressed="true" onclick="return add('craigslist');">Add</a>              </div>
             </div>
@@ -129,7 +135,9 @@
                         <th scope="col">City</th>
                         <th scope="col">Keyword</th>
                         <th scope="col">Slack Channel</th>
+                        <th scope="col">Icon</th>
                         <th scope="col">Delete</th>
+
                       </tr>
                     </thead>
                     <tbody>
@@ -139,6 +147,7 @@
                         <td >{{query.city}}</th>
                         <td >{{query.keyword}}</th>
                         <td >{{query.slackChannel}}</th>
+                        <td>{{query.icon}}</td>
                         <td > <a href="#" onclick="return deleteRow('indeed','IN{{loop.index}}');"> <i class="fas fa-trash-alt"></i> </a> </th>
                       </tr>
                       {% endfor %}
@@ -157,6 +166,10 @@
                 <div class="form-group">
                   <label for="inSlack">Slack Channel: </label>
                   <input type="text" class="form-control" id="inSlack" placeholder="#losangeles">
+                </div>
+                <div class="form-group">
+                  <label for="InIcon">Icon: </label>
+                  <input type="text" class="form-control" id="InIcon" placeholder=":briefcase:">
                 </div>
                 <a href="#" class="btn btn-primary" role="button" aria-pressed="true" onclick="return add('indeed');">Add</a>
               </div>
