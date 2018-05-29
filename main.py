@@ -119,7 +119,25 @@ def update():
                 db.session.add(inEntry)
         db.session.commit()
     elif status == "deleteRow":
-        pass
+        if request.json['service'] == 'craigslist':
+            if request.json['internship'] == 'True':
+                internship = True
+            else:
+                internship = False
+            row = craigslistModel.query.filter_by(city=request.json['city'],
+                                                    area=request.json['area'],
+                                                    category=request.json['category'],
+                                                    internship=internship,
+                                                    slackChannel=request.json['slackChannel']).first()
+
+            db.session.delete(row)
+            db.session.commit()
+        else:
+            row = indeedModel.query.filter_by(city = request.json['city'],
+                                                keyword=request.json['keyword'],
+                                                slackChannel=request.json['slackChannel']).first()
+            db.session.delete(row)
+            db.session.commit()
     return json.dumps({'status':'FAIL'})
 
 @app.route("/scrape")

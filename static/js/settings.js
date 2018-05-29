@@ -109,25 +109,64 @@ function add(service){
 function deleteRow(service,row){
   if (service == "craigslist") {
     console.log("CL DELETE");
-    $.post('/update',{
-      service:service,
-      status:"deleteRow"
-    }).done(function(deleteRow){
-      SuccessAlert("Row","deleted");
-    }).fail(function(deleteRow){
-      FailureAlert("Row","delete");
-    })
+    var row = $("#"+row);
+    var tds = row.children().closest("td");
+    console.log(tds);
+
+    var parms ={
+        city: tds[0].outerText,
+        area: tds[1].outerText,
+        category: tds[2].outerText,
+        internship: tds[3].outerText,
+        slackChannel: tds[4].outerText,
+        service:service,
+        status:"deleteRow"
+    };
+    $.ajax({
+      type:"POST",
+      url:"/update",
+      async:false,
+      data:JSON.stringify(parms,null,'\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success: function(){
+        SuccessAlert("Row","deleted");
+        row.remove();
+      },
+      error: function(){
+        FailureAlert("Row","delete");
+      }
+    });
   }
   else{
     console.log("IN DELETE");
-    $.post('/update',{
-      service:service,
-      status:"deleteRow"
-    }).done(function(deleteRow){
-      SuccessAlert("Row","deleted");
-    }).fail(function(deleteRow){
-      FailureAlert("Row","delete");
-    })
+    var row = $("#"+row);
+    var tds = row.children().closest("td");
+    console.log(tds);
+    var parms ={
+        city: tds[0].outerText,
+        keyword: tds[1].outerText,
+        slackChannel: tds[2].outerText,
+        service:service,
+        status:"deleteRow"
+    };
+    $.ajax({
+      type:"POST",
+      url:"/update",
+      async:false,
+      data:JSON.stringify(parms,null,'\t'),
+      contentType: 'application/json;charset=UTF-8',
+      success: function(){
+        SuccessAlert("Row","deleted");
+        row.remove();
+      },
+      error: function(){
+        FailureAlert("Row","delete");
+      }
+    });
+
+
+
+
   }
   return false;
 };

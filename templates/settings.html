@@ -56,21 +56,21 @@
                         <th scope="col">City</th>
                         <th scope="col">Area</th>
                         <th scope="col">Category</th>
-                        <th scope="col">Slack Channel</th>
                         <th scope="col">Internship</th>
+                        <th scope="col">Slack Channel</th>
                         <th scope="col">Delete</th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for query in clQuery %}
                       <tr id="CL{{loop.index}}">
-                        <th scope="col">{{loop.index}}</th>
-                        <th scope="col">{{query.city}}</th>
-                        <th scope="col">{{query.area}}</th>
-                        <th scope="col">{{query.category}}</th>
-                        <th scope="col">{{query.internship}}</th>
-                        <th scope="col">{{query.slackChannel}}</th>
-                        <th scope="col"> <a href="#" onclick="return deleteRow('craigslist','cl{{loop.index}}');"> <i class="fas fa-trash-alt"></i> </a> </th>
+                        <th scope="row">{{loop.index}}</th>
+                        <td >{{query.city}}</th>
+                        <td >{{query.area}}</th>
+                        <td >{{query.category}}</th>
+                        <td >{{query.internship}}</th>
+                        <td >{{query.slackChannel}}</th>
+                        <td > <a href="#" onclick="return deleteRow('craigslist','CL{{loop.index}}');"> <i class="fas fa-trash-alt"></i> </a> </th>
                       </tr>
                       {% endfor %}
                     </tbody>
@@ -134,13 +134,12 @@
                     </thead>
                     <tbody>
                       {% for query in inQuery %}
-                      <tr id="in{{loop.index}}">
+                      <tr id="IN{{loop.index}}">
                         <th scope="col">{{loop.index}}</th>
-                        <th scope="col">{{query.city}}</th>
-                        <th scope="col">{{query.keyword}}</th>
-                        <th scope="col">{{query.slackChannel}}</th>
-                        <th scope="col"> <a href="#" onclick="return deleteRow('indeed','in{{loop.index}}');"> <i class="fas fa-trash-alt"></i> </a> </th>
-
+                        <td >{{query.city}}</th>
+                        <td >{{query.keyword}}</th>
+                        <td >{{query.slackChannel}}</th>
+                        <td > <a href="#" onclick="return deleteRow('indeed','IN{{loop.index}}');"> <i class="fas fa-trash-alt"></i> </a> </th>
                       </tr>
                       {% endfor %}
                     </tbody>

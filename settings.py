@@ -1,3 +1,4 @@
+# TODO: Slowly get rid of this file.
 from dotenv import load_dotenv
 load_dotenv()
 import os

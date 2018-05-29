@@ -1,3 +1,4 @@
+# TODO: Edit Scrape.py
 from Queue import Queue
 
 from indeed.EZIndeed import EZIndeed
