@@ -106,23 +106,29 @@ function add(service){
   return false;
 };
 
-function deleteRow(service){
-  if (serivce == "craigslist") {
-
+function deleteRow(service,row){
+  if (service == "craigslist") {
+    console.log("CL DELETE");
+    $.post('/update',{
+      service:service,
+      status:"deleteRow"
+    }).done(function(deleteRow){
+      SuccessAlert("Row","deleted");
+    }).fail(function(deleteRow){
+      FailureAlert("Row","delete");
+    })
   }
   else{
-
+    console.log("IN DELETE");
+    $.post('/update',{
+      service:service,
+      status:"deleteRow"
+    }).done(function(deleteRow){
+      SuccessAlert("Row","deleted");
+    }).fail(function(deleteRow){
+      FailureAlert("Row","delete");
+    })
   }
-
-  $.post('/update',{
-
-    service:service,
-    status:"deleteRow"
-  }).done(function(deleteRow){
-    SuccessAlert("Row","deleted");
-  }).fail(function(deleteRow){
-    FailureAlert("Row","delete");
-  })
   return false;
 };
 

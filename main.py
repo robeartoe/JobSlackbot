@@ -5,7 +5,8 @@ try:
     import os
 except:
     import os
-from flask import Flask, request,render_template,url_for
+from flask import Flask,request,render_template,url_for,redirect
+from flask_login import LoginManager,logout_user,login_required,login_user
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import sqlalchemy
@@ -14,10 +15,13 @@ from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 app = Flask(__name__)
+login = LoginManager(app)
+login.login_view ='login'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['DEBUG'] = True
+app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
@@ -27,6 +31,8 @@ from scrape import do_scrape
 from models import Settings, Listing, indeedModel,craigslistModel
 
 @app.route("/")
+@app.route("/index")
+@login_required
 def main():
     if userSettings:
         inSetting = Settings.query.get(1).indeed
@@ -34,6 +40,25 @@ def main():
     inListing = Listing.query.filter_by(InorCl="IN").order_by(desc(Listing.created)).limit(50).all()
     clListings = Listing.query.filter_by(InorCl="CL").order_by(desc(Listing.created)).limit(50).all()
     return render_template("main.html",inListing=inListing,clListings=clListings)
+
+@app.route("/login",methods=["POST","GET"])
+def login():
+    if request.method =="POST":
+        print(request.form)
+        username = request.form['username']
+        pw = request.form['password']
+        user = Settings.query.get(1)
+        if user.check_password(pw):
+            login_user(user)
+            return redirect(url_for('main'))
+        else:
+            return render_template("login.html")
+    return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
 
 @app.route("/settings")
 def settings():

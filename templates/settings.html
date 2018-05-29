@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Oswald|Raleway" rel="stylesheet">
+    <!-- font-awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
  </head>
   <body>
     <div class="container">
@@ -17,6 +19,7 @@
             <h1 class="display-5">SlackBot Settings:</h1>
             <p class="lead">Allows you to set cities,services and keywords.</p>
             <a href="/" class="btn btn-primary btn-lg btn-block" role="button" aria-pressed="true">View Listings</a>
+            <a href="/logout" class="btn btn-primary btn-lg btn-block" role="button" aria-pressed="true">Logout</a>
           </div>
         </div>
       </div>
@@ -55,17 +58,19 @@
                         <th scope="col">Category</th>
                         <th scope="col">Slack Channel</th>
                         <th scope="col">Internship</th>
+                        <th scope="col">Delete</th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for query in clQuery %}
-                      <tr>
+                      <tr id="CL{{loop.index}}">
                         <th scope="col">{{loop.index}}</th>
                         <th scope="col">{{query.city}}</th>
                         <th scope="col">{{query.area}}</th>
                         <th scope="col">{{query.category}}</th>
                         <th scope="col">{{query.internship}}</th>
                         <th scope="col">{{query.slackChannel}}</th>
+                        <th scope="col"> <a href="#" onclick="return deleteRow('craigslist','cl{{loop.index}}');"> <i class="fas fa-trash-alt"></i> </a> </th>
                       </tr>
                       {% endfor %}
                     </tbody>
@@ -124,15 +129,18 @@
                         <th scope="col">City</th>
                         <th scope="col">Keyword</th>
                         <th scope="col">Slack Channel</th>
+                        <th scope="col">Delete</th>
                       </tr>
                     </thead>
                     <tbody>
                       {% for query in inQuery %}
-                      <tr>
+                      <tr id="in{{loop.index}}">
                         <th scope="col">{{loop.index}}</th>
                         <th scope="col">{{query.city}}</th>
                         <th scope="col">{{query.keyword}}</th>
                         <th scope="col">{{query.slackChannel}}</th>
+                        <th scope="col"> <a href="#" onclick="return deleteRow('indeed','in{{loop.index}}');"> <i class="fas fa-trash-alt"></i> </a> </th>
+
                       </tr>
                       {% endfor %}
                     </tbody>
