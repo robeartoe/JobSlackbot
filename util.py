@@ -1,33 +1,30 @@
 """
 This function is to post results to slack.
 """
+from models import craigslistModel,indeedModel,Listing
 import settings
 
-def postFromIndeed(sc,result,city):
-    # Simply copy and paste these statements to add more cities, or remove cities. Then change city accordingly.
-    if city == "Los Angeles" or city == 'losangeles':
-        description = "{}|{}|{}|{}|<{}>".format(result["formattedLocationFull"],result["jobtitle"],result["url"], result["company"], result["date"])
-        sc.api_call(
-            "chat.postMessage", channel = settings.slackLA, text = description,
-            username = 'pybot' , icon_emoji = ':palm_tree:'
-        )
-    else:
-        description = "{}|{}|{}|{}|<{}>".format(result["formattedLocationFull"],result["jobtitle"],result["url"], result["company"], result["date"])
-        sc.api_call(
-            "chat.postMessage", channel = settings.slackNY, text = description,
-            username = 'pybot' , icon_emoji = ':statue_of_liberty:'
-        )
-def postFromCraiglist(sc,listing,city):
-    # Simply copy and paste these statements to add more cities, or remove cities. Then change city accordingly.
-    if city == "Los Angeles" or city == 'losangeles':
-        description = "{}|{}|{}|<{}>".format(listing["where"],listing["name"],listing['url'],listing["datetime"])
-        sc.api_call(
-            "chat.postMessage", channel = settings.slackLA, text = description,
-            username = 'pybot' , icon_emoji = ':palm_tree:'
-        )
-    else:
-        description = "{}|{}|{}|<{}>".format(listing["where"],listing["name"],listing['url'],listing["datetime"])
-        sc.api_call(
-            "chat.postMessage", channel = settings.slackNY, text = description,
-            username = 'pybot' , icon_emoji = ':statue_of_liberty:'
-        )
+def postFromIndeed(sc,listings,inRow):
+    for listing in listings:
+        try:
+            description = "{}|{}|{}|{}|<{}>".format(listing.location, listing.title, listing.link,
+                                            listing.name, listing.created)
+            sc.api_call(
+            "chat.postMessage", channel=inRow.slackChannel, text=description,
+            username='pybot', icon_emoji=inRow.icon
+            )
+        except Exception as inst:
+            print(inst)
+            print("ERROR Posting to Slack.")
+
+def postFromCraiglist(sc,listings,clRow):
+    for listing in listings:
+        try:
+            description = "{}|{}|{}|<{}>".format(listing.location, listing.title, listing.link, listing.created)
+            sc.api_call(
+            "chat.postMessage", channel=clRow.slackChannel, text=description,
+            username='pybot', icon_emoji=clRow.icon
+            )
+        except Exception as inst:
+            print(inst)
+            print("ERROR Posting to Slack.")

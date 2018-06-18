@@ -1,23 +1,27 @@
-#In here all settings, all variables can be configured here.
-from indeed.indeed import IndeedApi
-from config.private import token
+# TODO: Slowly get rid of this file.
+from dotenv import load_dotenv
+load_dotenv()
+import os
 
+#In here all settings, all variables can be configured here.
 slackLA = "#losangeles"
 slackNY = "#newyork"
+slackToken = os.getenv("SLACK_TOKEN")
 
-#Indeed Api:
+#Indeed Api:-----------------------------------------------------------------------------------------------------
 useIndeed = True
-api = IndeedApi(token)
-JobKeywords = ["Python Internship","Web Developer Internship","Django Internship","python intern","web developer intern"]
-cities = ['Los Angeles', 'New York']
+indeedToken = os.getenv("INDEED_TOKEN")
+JobKeywords = ["Python Internship","Web Developer Internship","python intern","web developer intern","Computer Science Internship"]
+cities = ['Los Angeles']
+# Cities: cities = ['Los Angeles', 'New York']
 
-#Craigslist Api:
+#Craigslist Api:-------------------------------------------------------------------------------------------------
 useCraigslist = True
 jobCategorys = ['sof', 'jjj']
 want_internship = True
-resultNumber = 5 #Be careful with this, don't bring back too many results.
-Craigslistcities = ['losangeles','newyork']
-areas = {'losangeles': ['lac'] , 'newyork': ['mnh','brk','que','brx']}
+resultNumber = 3 #Be careful with this, don't bring back too many results.
+Craigslistcities = ['losangeles']
+# Craigslistcities = ['losangeles','newyork']
 
-SLEEP_INTERVAL = 180 * 60 #Three hour Interval
-#60 minutes. Change the first number to adjust minutes.
+areas = {'losangeles': ['lac']}
+# areas = {'losangeles': ['lac'] , 'newyork': ['mnh','brk','que','brx']}
