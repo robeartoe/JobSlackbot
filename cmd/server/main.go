@@ -1,21 +1,18 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
-	"cloud.google.com/go/bigquery"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/net/context"
 )
 
 func main() {
 	// Initialize BigQuery:
-	ctx := context.Background()
-	client, err := bigquery.NewClient(ctx, "slackbot-260723")
-	if err != nil {
-		log.Fatal(err)
-	}
+	// ctx := context.Background()
+	// client, err := bigquery.NewClient(ctx, "slackbot-260723")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 	// Initialize Gin:
 	r := gin.Default()
 	r.GET("/", func(c *gin.Context) {

@@ -1,2 +1,4 @@
 To build everything:
 go build ./...
+
+https://github.com/golang-standards/project-layout/issues/18

@@ -3,5 +3,11 @@
 ### Let's get a job!
 ---
 
-**Instructions:**
+## **Instructions:**
 * 
+
+## Building Packages:
+### Slackpost:
+```
+go build -o startslackpost ./cmd/slackpost/main.go
+```
