@@ -22,8 +22,8 @@ type ReponseData struct {
 
 // PubSubData returns response or error.
 type PubSubData struct {
-	Response *http.Response
-	Error    error
+	Id    string
+	Error error
 }
 
 // JobPostingData is the standardized data that is sent to pub/sub for processing (BQ, and Slack)

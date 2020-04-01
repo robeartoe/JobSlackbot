@@ -20,9 +20,8 @@ func HTTPServer(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("400 - Invalid Parameters!"))
-		return
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-
 	results, error := crawl(d)
 	if error != nil {
 		http.Error(w, error.Error(), http.StatusInternalServerError)

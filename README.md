@@ -10,4 +10,7 @@
 ### Slackpost:
 ```
 go build -o startslackpost ./cmd/slackpost/main.go
+go build -o startcrawler ./cmd/crawler/main.go
 ```
+## Debugging:
+https://flaviocopes.com/go-debugging-vscode-delve/
