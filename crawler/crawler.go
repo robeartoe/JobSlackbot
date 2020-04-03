@@ -22,28 +22,27 @@ func HTTPServer(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("400 - Invalid Parameters!"))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
-	results, error := crawl(d)
+	error := crawl(d)
 	if error != nil {
 		http.Error(w, error.Error(), http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
-	json.NewEncoder(w).Encode(results)
+	json.NewEncoder(w).Encode("OK")
 }
 
-func crawl(searchData library.SearchData) (string, error) {
-	result := "testresult"
+func crawl(searchData library.SearchData) error {
 	var err error
 
 	switch searchData.Source {
 	case "indeed":
 		indeed.Crawl()
-		return result, err
+		return err
 	case "github":
-		result, err := github.Crawl(searchData)
-		return result, err
+		err := github.Crawl(searchData)
+		return err
 	default:
 		fmt.Println("Hello World!")
-		return "result", err
+		return err
 	}
 }

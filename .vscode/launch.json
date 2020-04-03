@@ -28,9 +28,15 @@
             "port": 2345,
             "host": "127.0.0.1",
             "program": "${fileDirname}",
-            "env": {"GOOGLE_APPLICATION_CREDENTIALS": "/Users/Robert/Go/src/github.com/robeartoe/JobSlackbot/crawler/slackbot-260723-7dd986e39019.json"},
             "args": [],
+            "env": {
+                "GOOGLE_APPLICATION_CREDENTIALS": "/home/robert/go/src/github.com/robeartoe/JobSlackbot/crawler/slackbot-260723-b6c63803cdc2.json"
+            },
             "showLog": true
         }
     ]
 }
+
+            // "envFile": "/home/robert/go/src/github.com/robeartoe/JobSlackbot/.env",
+// export GOOGLE_APPLICATION_CREDENTIALS="/home/robert/go/src/github.com/robeartoe/JobSlackbot/crawler/slackbot-260723-02f5042a30cf.json"
+

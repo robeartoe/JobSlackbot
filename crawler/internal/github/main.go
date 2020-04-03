@@ -1,12 +1,11 @@
 package github
 
 import (
-	"bufio"
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 	"time"
 
 	library "github.com/robeartoe/JobSlackbot/crawler/internal/interfaces"
@@ -44,7 +43,7 @@ type post struct {
 }
 
 // Crawl Github's API given Job & Location Queries
-func Crawl(searchData library.SearchData) (string, error) {
+func Crawl(searchData library.SearchData) error {
 	// Idea is to use channels, to separate all of these job & location queries into their own separate things. Then merge the results into one array.
 	// After the array is returned, it is sent to another function to be transformed.
 
@@ -54,41 +53,51 @@ func Crawl(searchData library.SearchData) (string, error) {
 	var builtData []library.JobPostingData
 
 	// Setup Channel to fetch all results:
-	c := make(chan githubResult)
-	for i := 0; i < len(combinations); i++ {
-		go fetchJobs(combinations[i], c)
+	c := make(chan githubResult, len(combinations))
+	var wg sync.WaitGroup
+	for _, combination := range combinations {
+		wg.Add(1)
+		go fetchJobs(combination, c, &wg)
 	}
-
+	wg.Wait()
+	close(c)
 	for result := range c {
 		if result.Error != nil {
 			fmt.Println("Failed Fetch!")
+			return result.Error
 		}
 		// If no error, build the data:
 		builtData = append(builtData, buildJobPostings(result)...)
 	}
 
 	// Setup Channel to post to Pub/Sub:
-	cPubSub := make(chan library.PubSubData)
-	for j := 0; j < len(builtData); j++ {
-		var b bytes.Buffer
-		buf := bufio.NewWriter(&b)
-		go pubsub.Publish(buf, builtData[j], cPubSub)
-	}
+	// cPubSub := make(chan library.PubSubData)
+	// var wgPubSub sync.WaitGroup
+	// var err error
+	// for _, data := range builtData {
+	// 	wgPubSub.Add(1)
+	// 	go pubsub.Publish(data, cPubSub, &wgPubSub)
+	// }
+	// wgPubSub.Wait()
+	// close(cPubSub)
 
-	for result := range cPubSub {
+	cPubSub := make(chan []library.PubSubData)
+	var err error
+	go pubsub.Publish(builtData, cPubSub)
+	pubSubs := <-cPubSub
+	for _, result := range pubSubs {
 		if result.Error != nil {
-			return "", result.Error
+			err = result.Error
+			break
 		}
-		fmt.Print(result.Id)
+		fmt.Println(result.Id)
 	}
-	return "Success!", nil
+	return err
 }
 
 // https://www.oreilly.com/library/view/concurrency-in-go/9781491941294/ch04.html#callout_concurrency_patterns_in_go_CO7-1
 // Fetch request and json
-func fetchJobs(job searchTerm, c chan githubResult) {
-	defer close(c)
-
+func fetchJobs(job searchTerm, c chan githubResult, wg *sync.WaitGroup) {
 	var result []post
 	baseURL, err := url.Parse("https://jobs.github.com/positions.json")
 	if err != nil {
@@ -109,9 +118,9 @@ func fetchJobs(job searchTerm, c chan githubResult) {
 	if errBody != nil {
 		c <- githubResult{Error: errBody}
 	}
-
 	c <- githubResult{Posts: result}
 	defer resp.Body.Close()
+	defer wg.Done()
 }
 
 // buildJobPostings builds a standardized job posting array that will be sent to the pubsub queue.
