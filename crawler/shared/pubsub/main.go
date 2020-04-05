@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 
 	pubsub "cloud.google.com/go/pubsub"
-	library "github.com/robeartoe/JobSlackbot/crawler/internal/interfaces"
+	library "github.com/robeartoe/JobSlackbot/crawler/shared/interfaces"
 )
 
 // Publish results from various APIs to Google's Pub/Sub listing job queue.

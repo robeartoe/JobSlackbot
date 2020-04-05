@@ -1,0 +1,1 @@
+gcloud functions deploy bigquery --entry-point PubSubEntry --runtime go113 --trigger-topic listing

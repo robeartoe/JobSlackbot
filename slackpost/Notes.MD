@@ -22,3 +22,9 @@ https://stackoverflow.com/questions/52079662/go-get-cannot-find-local-packages-w
 ```
 go build -o start ./cmd
 ```
+
+## When deploying to Cloud Function:
+Make sure to have the packages in the vendor folder within the directory.
+```bash
+go mod vendor
+```

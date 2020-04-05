@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	github "github.com/robeartoe/JobSlackbot/crawler/internal/github"
-	indeed "github.com/robeartoe/JobSlackbot/crawler/internal/indeed"
-	library "github.com/robeartoe/JobSlackbot/crawler/internal/interfaces"
+	"github.com/robeartoe/JobSlackbot/crawler/shared/github"
+	"github.com/robeartoe/JobSlackbot/crawler/shared/indeed"
+	library "github.com/robeartoe/JobSlackbot/crawler/shared/interfaces"
 )
 
 // SearchData defines job search data to be passed into the crawl function.

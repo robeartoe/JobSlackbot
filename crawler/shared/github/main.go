@@ -8,8 +8,8 @@ import (
 	"sync"
 	"time"
 
-	library "github.com/robeartoe/JobSlackbot/crawler/internal/interfaces"
-	"github.com/robeartoe/JobSlackbot/crawler/internal/pubsub"
+	library "github.com/robeartoe/JobSlackbot/crawler/shared/interfaces"
+	"github.com/robeartoe/JobSlackbot/crawler/shared/pubsub"
 )
 
 func new(search string, location string) searchTerm {
@@ -70,17 +70,6 @@ func Crawl(searchData library.SearchData) error {
 		builtData = append(builtData, buildJobPostings(result)...)
 	}
 
-	// Setup Channel to post to Pub/Sub:
-	// cPubSub := make(chan library.PubSubData)
-	// var wgPubSub sync.WaitGroup
-	// var err error
-	// for _, data := range builtData {
-	// 	wgPubSub.Add(1)
-	// 	go pubsub.Publish(data, cPubSub, &wgPubSub)
-	// }
-	// wgPubSub.Wait()
-	// close(cPubSub)
-
 	cPubSub := make(chan []library.PubSubData)
 	var err error
 	go pubsub.Publish(builtData, cPubSub)
@@ -90,7 +79,6 @@ func Crawl(searchData library.SearchData) error {
 			err = result.Error
 			break
 		}
-		fmt.Println(result.Id)
 	}
 	return err
 }
