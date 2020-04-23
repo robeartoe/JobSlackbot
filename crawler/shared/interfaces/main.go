@@ -35,6 +35,7 @@ type JobPostingData struct {
 	HowToApply string
 	URL        string
 	JobType    string
+	Source     string
 	Created    time.Time
 	Error      error
 	Data       interface{}

@@ -115,7 +115,7 @@ func fetchJobs(job searchTerm, c chan githubResult, wg *sync.WaitGroup) {
 func buildJobPostings(data githubResult) []library.JobPostingData {
 	var fullData []library.JobPostingData
 	for i := 0; i < len(data.Posts); i++ {
-		created, err := time.Parse(`"`+time.RFC3339+`"`, data.Posts[i].Created)
+		created, err := time.Parse(`"`+time.UnixDate+`"`, data.Posts[i].Created)
 		if err != nil {
 
 		}
@@ -127,6 +127,7 @@ func buildJobPostings(data githubResult) []library.JobPostingData {
 			HowToApply: data.Posts[i].HowToApply,
 			URL:        data.Posts[i].URL,
 			JobType:    data.Posts[i].JobType,
+			Source:     "github",
 			Created:    created,
 			Data:       data.Posts[i],
 		})

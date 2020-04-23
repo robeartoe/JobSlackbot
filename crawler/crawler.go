@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/robeartoe/JobSlackbot/crawler/shared/github"
-	"github.com/robeartoe/JobSlackbot/crawler/shared/indeed"
+	github "github.com/robeartoe/JobSlackbot/crawler/shared/github"
+	indeed "github.com/robeartoe/JobSlackbot/crawler/shared/indeed"
 	library "github.com/robeartoe/JobSlackbot/crawler/shared/interfaces"
 )
-
-// SearchData defines job search data to be passed into the crawl function.
 
 // HTTPServer is an HTTP Cloud Function with a request parameter.
 func HTTPServer(w http.ResponseWriter, r *http.Request) {
