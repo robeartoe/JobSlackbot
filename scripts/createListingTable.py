@@ -3,15 +3,27 @@ from google.cloud import bigquery
 # Construct a BigQuery client object.
 client = bigquery.Client()
 
-# TODO(developer): Set table_id to the ID of the table to create.
-# table_id = "your-project.your_dataset.your_table_name"
+table_id = "slackbot-260723.jobs.listings"
 
 schema = [
-    bigquery.SchemaField("full_name", "STRING", mode="REQUIRED"),
-    bigquery.SchemaField("age", "INTEGER", mode="REQUIRED"),
+    bigquery.SchemaField("Company", "STRING"),
+    bigquery.SchemaField("CompanyURL", "STRING"),
+    bigquery.SchemaField("Location", "STRING"),
+    bigquery.SchemaField("Title", "STRING"),
+    bigquery.SchemaField("HowToApply", "STRING"),
+    bigquery.SchemaField("URL", "STRING"),
+    bigquery.SchemaField("JobType", "STRING"),
+    bigquery.SchemaField("Source", "STRING"),
+    bigquery.SchemaField("Created", "TIMESTAMP"),
+    bigquery.SchemaField("InsertDate", "TIMESTAMP"),
+    bigquery.SchemaField("Data", "STRING"),
 ]
 
 table = bigquery.Table(table_id, schema=schema)
+table.time_partitioning = bigquery.TimePartitioning(
+    type_=bigquery.TimePartitioningType.DAY,
+    field="InsertDate",  # name of column to use for partitioning
+) 
 table = client.create_table(table)  # Make an API request.
 print(
     "Created table {}.{}.{}".format(table.project, table.dataset_id, table.table_id)

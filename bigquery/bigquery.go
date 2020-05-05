@@ -91,6 +91,7 @@ func postToBigquery(job UploadData) error {
 	client, err := bigquery.NewClient(ctx, "slackbot-260723")
 	defer client.Close()
 	if err != nil {
+		println(err)
 		return err
 	}
 
@@ -99,6 +100,7 @@ func postToBigquery(job UploadData) error {
 	listings := defaultDataset.Table("listings")
 	inserter := listings.Inserter()
 	if err := inserter.Put(ctx, job); err != nil {
+		println(err)
 		return err
 	}
 
