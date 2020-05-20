@@ -29,14 +29,20 @@ func main() {
 			log.Fatalf("Query Function: %v", err)
 			panic(err)
 		}
-		println(rows)
 
 		// Format/Aggregate Query:
-		// posts, err := util.ReadQuery(ctx, client, query)
-		// if err != nil {
-		// 	log.Fatalf("Query Function: %v", err)
-		// 	panic(err)
-		// }
+		post, err := util.BuildMessage(rows)
+		if err != nil {
+			log.Fatalf("Build Message: %v", err)
+			panic(err)
+		}
+
+		// Send Post:
+		err = util.PostToSlack(post)
+		if err != nil {
+			log.Fatalf("Post Message: %v", err)
+			panic(err)
+		}
 
 		c.Send("Sent Messages!")
 		defer client.Close()
