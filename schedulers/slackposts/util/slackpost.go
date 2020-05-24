@@ -39,7 +39,7 @@ func buildAttachments(rows []JobPostingData) []Attachment {
 // BuildMessage will build the entire message
 func BuildMessage(rows []JobPostingData) (Post, error) {
 	p := Post{
-		Text:       fmt.Sprintf("New %d Job Listings!", len(rows)),
+		Text:       fmt.Sprintf("%d New Job Listings!", len(rows)),
 		Attachment: buildAttachments(rows),
 	}
 	return p, nil
@@ -59,7 +59,7 @@ func PostToSlack(post Post) error {
 		return err
 	}
 	defer resp.Body.Close()
-	if resp.Status != "200" {
+	if resp.StatusCode != 200 {
 		return errors.New("Post to Slack failed")
 	}
 	return nil
