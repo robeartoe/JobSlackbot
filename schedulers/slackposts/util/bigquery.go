@@ -39,7 +39,6 @@ func Query(ctx context.Context, client *bigquery.Client, today time.Time) ([]Job
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(data)
 	return data, nil
 }
 

@@ -13,13 +13,13 @@ import (
 type Post struct {
 	Text       string `json:"text"`
 	Emoji      string `json:"emoji"`
-	Attachment Attachment
+	Attachment []Attachment
 }
 
 // Attachment defines Slack Attachment detailing info about Job Post
 type Attachment struct {
 	Title     string `json:"title,omitempty"`
-	TitleLink string `json:"TitleLink,omitempty"`
+	TitleLink string `json:"titlelink,omitempty"`
 	Pretext   string `json:"pretext,omitempty"`
 	Text      string `json:"text,omitempty"`
 }
@@ -60,14 +60,18 @@ func PostMessage(post Post) (SentPost, error) {
 		emoji = ":incoming_envelope:"
 	}
 
-	attachment := slack.Attachment{
-		Title:     post.Attachment.Title,
-		TitleLink: post.Attachment.TitleLink,
-		Pretext:   post.Attachment.Pretext,
-		Text:      post.Attachment.Text,
+	var attachments []slack.Attachment
+	for i := 0; i < len(post.Attachment); i++ {
+		data := slack.Attachment{
+			Title:     post.Attachment[i].Title,
+			TitleLink: post.Attachment[i].TitleLink,
+			Pretext:   post.Attachment[i].Pretext,
+			Text:      post.Attachment[i].Text,
+		}
+		attachments = append(attachments, data)
 	}
 
-	channelID, timestamp, err := api.PostMessage("jobs", slack.MsgOptionText(post.Text, false), slack.MsgOptionUsername("Slackbot"), slack.MsgOptionIconEmoji(emoji), slack.MsgOptionAttachments(attachment))
+	channelID, timestamp, err := api.PostMessage("jobs", slack.MsgOptionText(post.Text, false), slack.MsgOptionUsername("Slackbot"), slack.MsgOptionIconEmoji(emoji), slack.MsgOptionAttachments(attachments...))
 	if err != nil {
 		fmt.Printf("%s\n", err)
 		return SentPost{}, err
@@ -78,5 +82,6 @@ func PostMessage(post Post) (SentPost, error) {
 		Timestamp: timestamp,
 	}
 	fmt.Printf("Message successfully sent to channel %s at %s", channelID, timestamp)
+
 	return returnValue, nil
 }
