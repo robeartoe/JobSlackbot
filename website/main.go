@@ -9,8 +9,6 @@ func main() {
 		c.Send("Hello, World!")
 	})
 
-	app.Static("/", "/public")
-	app.Static("/prefix", "/public")
-	app.Static("*", "/public/index.html")
+	app.Static("/", "./public")
 	app.Listen("localhost:3000")
 }
