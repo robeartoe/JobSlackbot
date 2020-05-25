@@ -1,0 +1,9 @@
+cron:
+-   description: "Daily Crawl"
+    url: /
+    target: scheduler-crawler
+    schedule: every day 06:00
+-   description: "Daily Slackpost"
+    url: /
+    target: slackpost-scheduler
+    schedule: every day 08:00
